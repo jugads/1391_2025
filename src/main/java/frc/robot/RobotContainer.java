@@ -84,10 +84,12 @@ public class RobotContainer {
     //autoChooser.addRoutine("Example Routine", this::exampleRoutine);
     autoChooser.addCmd("firstpathsketch", () -> autos.testpath());
     drivetrain.resetGyro(180.);
+    autoChooser.addCmd("Path Connection Test", () -> autos.pathConnectingTest());
+    
     // Put the auto chooser on the dashboard
     SmartDashboard.putData(autoChooser);
     // Schedule the selected auto during the autonomous period
-    RobotModeTriggers.autonomous().whileTrue(autos.testpath());
+    RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommand());
        
         // SmartDashboard.putNumber("Current Draw Climber", motor.getOutputCurrent());
         publisher = NetworkTableInstance.getDefault()
