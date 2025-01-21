@@ -45,6 +45,8 @@ private final double fadeSpeed = 0.1; // Adjust this value for fade speed
     ledsObject.setLength(buffer.getLength());
     ledsObject.setData(buffer);
     ledsObject.start();
+    DataLogManager.start();
+    DriverStation.startDataLog(DataLogManager.getLog());
     // Initialize LEDs
     leds = new Leds(ledsObject, buffer); // PWM port 9
     // Initialize timer for animation
@@ -70,9 +72,8 @@ private final double fadeSpeed = 0.1; // Adjust this value for fade speed
   public void disabledInit() {
     timer = new Timer();
     timer.start();
-    // DataLogManager.start();
-    // // DataLog log = DataLogManager.getLog();
-    // DriverStation.startDataLog(DataLogManager.getLog());
+    
+    // DataLog log = DataLogManager.getLog();
   }
 
   @Override

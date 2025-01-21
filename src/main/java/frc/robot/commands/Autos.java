@@ -20,6 +20,7 @@ import choreo.Choreo.TrajectoryLogger;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import choreo.trajectory.Trajectory;
 import choreo.trajectory.TrajectorySample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,7 +36,6 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 public class Autos extends Command {
   AutoFactory autoFactory;
   CommandSwerveDrivetrain drivetrain;
-  AutoTrajectory traj;
   /** Creates a new Autos. */
   public Autos(CommandSwerveDrivetrain drivetrain) {
      // The drive subsystem
