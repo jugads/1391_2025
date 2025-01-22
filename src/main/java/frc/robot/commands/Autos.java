@@ -20,7 +20,7 @@ import choreo.Choreo.TrajectoryLogger;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import choreo.trajectory.Trajectory;
+
 import choreo.trajectory.TrajectorySample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,6 +36,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 public class Autos extends Command {
   AutoFactory autoFactory;
   CommandSwerveDrivetrain drivetrain;
+  
   /** Creates a new Autos. */
   public Autos(CommandSwerveDrivetrain drivetrain) {
      // The drive subsystem
@@ -46,12 +47,27 @@ public class Autos extends Command {
   }
 
  public Command testpath() {
+  
   return Commands.sequence(
     new SequentialCommandGroup(
       new InstantCommand(() -> drivetrain.resetGyro(0)),
       new InstantCommand(() -> drivetrain.resetPose(new Pose2d(9.66354751586914, 4.0638532638549805, drivetrain.getPigeon2().getRotation2d())))
     ),
     autoFactory.trajectoryCmd("New Path"));
+ }
+ public Command pathConnectingTest() {
+  return Commands.sequence(
+    new SequentialCommandGroup(
+      new InstantCommand(() -> drivetrain.resetGyro(180)),
+      new InstantCommand(() -> drivetrain.resetPose(new Pose2d(7.278804302215576, 2.9282612800598145, drivetrain.getPigeon2().getRotation2d())))
+    ),
+    autoFactory.trajectoryCmd("Start-FBranch"),
+    autoFactory.trajectoryCmd("FBranch-Source"),
+    autoFactory.trajectoryCmd("Source-DBranch"),
+    autoFactory.trajectoryCmd("DBranch-Source"),
+    autoFactory.trajectoryCmd("Source-CBranch")
+    );
+  
  }
   // Called when the command is initially scheduled.
   @Override

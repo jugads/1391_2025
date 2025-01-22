@@ -83,7 +83,6 @@ public class RobotContainer {
     // Add options to the chooser
     //autoChooser.addRoutine("Example Routine", this::exampleRoutine);
     autoChooser.addCmd("firstpathsketch", () -> autos.testpath());
-    drivetrain.resetGyro(180.);
     autoChooser.addCmd("Path Connection Test", () -> autos.pathConnectingTest());
     
     // Put the auto chooser on the dashboard
