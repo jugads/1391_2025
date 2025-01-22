@@ -340,7 +340,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     @Override
     public void periodic() {
         poseEstimator.update(getPigeon2().getRotation2d(), getModulePositions());
-        if (DriverStation.isAutonomous()) {
+        if (!DriverStation.isAutonomous()) {
         if (getTVFront()) {
             poseEstimator.resetPose(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()));
             lastPose = new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d());
