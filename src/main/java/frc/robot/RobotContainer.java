@@ -88,7 +88,7 @@ public class RobotContainer {
     // Put the auto chooser on the dashboard
     SmartDashboard.putData(autoChooser);
     // Schedule the selected auto during the autonomous period
-    RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommand());
+    RobotModeTriggers.autonomous().whileTrue(autos.pathConnectingTest());
        
         // SmartDashboard.putNumber("Current Draw Climber", motor.getOutputCurrent());
         publisher = NetworkTableInstance.getDefault()

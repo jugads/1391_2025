@@ -59,7 +59,7 @@ public class Autos extends Command {
   return Commands.sequence(
     new SequentialCommandGroup(
       new InstantCommand(() -> drivetrain.resetGyro(180)),
-      new InstantCommand(() -> drivetrain.resetPose(new Pose2d(7.278804302215576, 2.9282612800598145, drivetrain.getPigeon2().getRotation2d())))
+      new InstantCommand(() -> drivetrain.resetPose(new Pose2d(9.641256332397461,5.023218154907227, drivetrain.getPigeon2().getRotation2d())))
     ),
     autoFactory.trajectoryCmd("Start-FBranch"),
     autoFactory.trajectoryCmd("FBranch-Source"),
