@@ -58,11 +58,17 @@ public class Autos extends Command {
  public AutoRoutine pathConnectingTest() {
   final AutoRoutine autoRoutine = autoFactory.newRoutine("Path Connecting Test");
   final AutoTrajectory path = autoRoutine.trajectory("BStart-FBranch");
+  final AutoTrajectory path1 = autoRoutine.trajectory("BFBranch-Source-DBranch");
+  final AutoTrajectory path2 = autoRoutine.trajectory("BDBranch-Source-CBranch");
+  
   autoRoutine.active().onTrue(
     path.resetOdometry()
     .andThen(
-      path.cmd()
+      path.cmd(),
+      path1.cmd(),
+      path2.cmd()
     )
+    
   );
   return autoRoutine;
  }
