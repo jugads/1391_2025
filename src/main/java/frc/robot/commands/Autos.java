@@ -55,11 +55,22 @@ public class Autos extends Command {
     ),
     autoFactory.trajectoryCmd("New Path"));
  }
- public Command pathConnectingTest() {
+ public AutoRoutine pathConnectingTest() {
+  final AutoRoutine autoRoutine = autoFactory.newRoutine("Path Connecting Test");
+  final AutoTrajectory path = autoRoutine.trajectory("BStart-FBranch");
+  autoRoutine.active().onTrue(
+    path.resetOdometry()
+    .andThen(
+      path.cmd()
+    )
+  );
+  return autoRoutine;
+ }
+ public Command spin() {
   return Commands.sequence(
     new SequentialCommandGroup(
-      new InstantCommand(() -> drivetrain.resetGyro(180)),
-      new InstantCommand(() -> drivetrain.resetPose(new Pose2d(10.269196510314941,5.023218154907227, drivetrain.getPigeon2().getRotation2d())))
+      new InstantCommand(() -> drivetrain.resetGyro(0)),
+      new InstantCommand(() -> drivetrain.resetPose(new Pose2d(8.811853408813477,4.044926643371582, drivetrain.getPigeon2().getRotation2d())))
     ),
     autoFactory.trajectoryCmd("RStart-FBranch")
     // autoFactory.trajectoryCmd("FBranch-Source"),

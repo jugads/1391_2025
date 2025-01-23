@@ -391,7 +391,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             () -> this.getPose(),
             this::resetPose,
             this::followPath,
-            false,
+            true,
             this,
             trajLogger
         );
@@ -406,10 +406,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         var pose = getPose();
 
         var targetSpeeds = sample.getChassisSpeeds();
-        targetSpeeds.vxMetersPerSecond += m_pathXController.calculate(
+        targetSpeeds.vxMetersPerSecond += -m_pathXController.calculate(
             pose.getX(), sample.x
         );
-        targetSpeeds.vyMetersPerSecond += m_pathYController.calculate(
+        targetSpeeds.vyMetersPerSecond += -m_pathYController.calculate(
             pose.getY(), sample.y
         );
         targetSpeeds.omegaRadiansPerSecond += m_pathThetaController.calculate(

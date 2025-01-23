@@ -47,6 +47,7 @@ import com.revrobotics.spark.SparkMax;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import frc.robot.commands.Straighten;
@@ -74,21 +75,17 @@ public class RobotContainer {
     // private final  SendableChooser<Command> autoChooser;
     // SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(drivetrain.getKinematics(), new Rotation2d(logger.getCurrentRot()), drivetrain.getModulePositions(), drivetrain.getPoseLL());
     StructPublisher<Pose2d> publisher;
-    private AutoChooser autoChooser;
+    private AutoChooser autoChooser = new AutoChooser();
     private AutoFactory autoFactory;
     Pose2d pose;
     private final Autos autos = new Autos(drivetrain);
     public RobotContainer() {
-        autoChooser = new AutoChooser();
     // Add options to the chooser
-    //autoChooser.addRoutine("Example Routine", this::exampleRoutine);
-    autoChooser.addCmd("firstpathsketch", () -> autos.testpath());
-    autoChooser.addCmd("Path Connection Test", () -> autos.pathConnectingTest());
-    
+    autoChooser.addRoutine("Example Routine", autos::pathConnectingTest);
     // Put the auto chooser on the dashboard
     SmartDashboard.putData(autoChooser);
     // Schedule the selected auto during the autonomous period
-    RobotModeTriggers.autonomous().whileTrue(autos.pathConnectingTest());
+    RobotModeTriggers.autonomous().whileTrue(autos.pathConnectingTest().cmd());
        
         // SmartDashboard.putNumber("Current Draw Climber", motor.getOutputCurrent());
         publisher = NetworkTableInstance.getDefault()
