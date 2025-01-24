@@ -53,7 +53,7 @@ public class RobotContainer {
     // private final  SendableChooser<Command> autoChooser;
     // SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(drivetrain.getKinematics(), new Rotation2d(logger.getCurrentRot()), drivetrain.getModulePositions(), drivetrain.getPoseLL());
     StructPublisher<Pose2d> publisher;
-    Autos autos = new Autos(drivetrain);
+    Autos autos = new Autos(drivetrain, driveRR);
     public RobotContainer() {
     // Add options to the chooser
     

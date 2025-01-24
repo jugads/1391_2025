@@ -38,15 +38,12 @@ public class Robot extends TimedRobot {
 private double brightness = 0;     // Current brightness (0-1 range)
 private final double fadeSpeed = 0.1; // Adjust this value for fade speed
   private AutoChooser autoChooser;
-    private final Autos autos = new Autos(drivetrain);
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();    
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
     // Initialize LEDs
-    autoChooser = new AutoChooser();
-    autoChooser.addRoutine("Example Routine", autos::pathConnectingTest);
     // Put the auto chooser on the dashboard
     // Shuffleboard.getTab("Autonomous").add(autoChooser);
     SmartDashboard.putData(autoChooser);
