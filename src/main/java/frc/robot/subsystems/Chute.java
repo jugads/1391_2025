@@ -12,20 +12,25 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Chute extends SubsystemBase {
+  // Motor controller for the chute mechanism
   SparkMax motor;
+
+  // Constructor initializes the chute's brushless motor with specified ID
   public Chute() {
     motor = new SparkMax(kMotorID, MotorType.kBrushless);
   }
 
+  // Periodic method runs repeatedly - currently empty but available for future monitoring
   @Override
   public void periodic() {
-
   }
   
+  // Sets the chute motor to run at the specified speed (-1.0 to 1.0)
   public void runMotor(double speed) {
     motor.set(speed);
   }
 
+  // Safely stops the chute motor by setting speed to zero
   public void stopMotor() {
     motor.set(0);
   }

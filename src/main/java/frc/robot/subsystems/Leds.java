@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -13,13 +15,50 @@ public class Leds extends SubsystemBase {
   /** Creates a new Leds. */
   AddressableLED leds;
   AddressableLEDBuffer buffer;
-  public Leds(AddressableLED leds, AddressableLEDBuffer buffer) {
+  Timer timer;
+  Arm arm;
+  AlgaeScorer algaeScorer;
+  Knuckle knuckle;
+  public Leds(AddressableLED leds, AddressableLEDBuffer buffer, Arm arm, Knuckle knuckle, AlgaeScorer algaeScorer) {
     this.leds = leds;
     this.buffer = buffer;
+    this.arm = arm;
+    this.algaeScorer = algaeScorer;
+    this.knuckle = knuckle;
+    timer.start();
+    leds.setLength(buffer.getLength());
+    leds.setData(buffer);
+    leds.start();
   }
 
   @Override
   public void periodic() {
+    if (DriverStation.isDisabled()) {
+    double time = timer.get();
+    int length = buffer.getLength();
+
+    for (int i = 0; i < length; i++) {
+      // Spread hues across LEDs and animate over time
+      int hue = (int) ((time * 100 + (i * 360.0 / length)) % 360); // Adjust time multiplier for speed
+      int saturation = 255; // Full saturation
+      int value = 50;      // Full brightness
+      buffer.setLED(i, Color.fromHSV(hue, saturation, value));
+    }
+
+    // Push updated LED data to the strip
+    leds.setData(buffer);
+  }
+  else {
+    if (arm.atTransferAngle()) {
+      setAll(Color.kFirebrick);
+    }
+    else if (knuckle.hasCoral()) {
+      setAll(Color.kWhiteSmoke);
+    }
+    else if (algaeScorer.hasAlgae()) {
+      setAll(Color.kAqua);
+    }
+  }
     // This method will be called once per scheduler run
   }
 
@@ -28,5 +67,63 @@ public class Leds extends SubsystemBase {
       buffer.setLED(i, color); // Set all LEDs to red
     }
     leds.setData(buffer);
+  }
+
+  // Sets the color of the top half of the LED strip
+  public void setTop(Color color) {
+    int midPoint = buffer.getLength() / 2;
+    for (int i = midPoint; i < buffer.getLength(); i++) {
+      buffer.setLED(i, color);
+    }
+    leds.setData(buffer);
+  }
+
+  // Sets the color of the bottom half of the LED strip
+  public void setBottom(Color color) {
+    int midPoint = buffer.getLength() / 2;
+    for (int i = 0; i < midPoint; i++) {
+      buffer.setLED(i, color);
+    }
+    leds.setData(buffer);
+  }
+
+  // Sets the color of the top third of the LED strip
+  public void setTopThird(Color color) {
+    int length = buffer.getLength();
+    int startIndex = (length * 2) / 3;
+    for (int i = startIndex; i < length; i++) {
+      buffer.setLED(i, color);
+    }
+    leds.setData(buffer);
+  }
+
+  // Sets the color of the middle third of the LED strip
+  public void setMiddleThird(Color color) {
+    int length = buffer.getLength();
+    int startIndex = length / 3;
+    int endIndex = (length * 2) / 3;
+    for (int i = startIndex; i < endIndex; i++) {
+      buffer.setLED(i, color);
+    }
+    leds.setData(buffer);
+  }
+
+  // Sets the color of the bottom third of the LED strip
+  public void setBottomThird(Color color) {
+    int length = buffer.getLength();
+    int endIndex = length / 3;
+    for (int i = 0; i < endIndex; i++) {
+      buffer.setLED(i, color);
+    }
+    leds.setData(buffer);
+  }
+
+  // Makes the LEDs flash by alternating between the specified color and black
+  public void flash(Color color) {
+    if ((int)(timer.get() * 2) % 2 == 0) {
+      setAll(color);
+    } else {
+      setAll(Color.kBlack);
+    }
   }
 }

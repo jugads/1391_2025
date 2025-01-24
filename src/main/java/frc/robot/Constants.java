@@ -20,4 +20,14 @@ public class Constants {
         public static final double kCurrentThreshold = 30;
         
     }
+    public class ElevatorConstants{
+        public static final int kMotorID = 0;
+        public static final int kOtherMotorID = 0;
+        public static final int kDownLimitPort = 0;
+        public static final int kUpLimitPort = 0;
+    }
+    public class ArmConstants{
+        public static final int kMotorID = 0;
+        public static final int kEncoderPort = 0;
+    }
 }

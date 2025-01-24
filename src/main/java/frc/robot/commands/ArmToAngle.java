@@ -4,31 +4,35 @@
 
 package frc.robot.commands;
 
-import com.ctre.phoenix6.swerve.SwerveRequest;
-
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Arm;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class AlignWithCoralStation extends Command {
-  /** Creates a new AlignWithCoralStation. */
-  CommandSwerveDrivetrain drivetrain;
-  SwerveRequest.RobotCentric drive;
-  public AlignWithCoralStation(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric drive) {
-    this.drivetrain = drivetrain;
-    this.drive = drive;
-    // Use addRequirements() here to declare subsystem dependencies.
+public class ArmToAngle extends Command {
+  /** Creates a new ArmToAngle. */
+  PIDController controller;
+  Arm m_arm;
+  double desiredArmAngle;
+
+  public ArmToAngle(Arm arm, double angle) {
+    controller = new PIDController(0,0,0);
+    m_arm = arm;
+    desiredArmAngle = angle;
+    addRequirements(arm);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    controller.setSetpoint(desiredArmAngle);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // new RotateToAprilTag(drivetrain, drive);
-    }
+  m_arm.runMotor(controller.calculate(m_arm.getEncoderPosition()));
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -37,6 +41,6 @@ public class AlignWithCoralStation extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return controller.atSetpoint();
   }
 }

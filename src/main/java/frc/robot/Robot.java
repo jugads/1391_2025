@@ -31,7 +31,6 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-  private Leds leds;
   private AddressableLEDBuffer buffer;
   private AddressableLED ledsObject = new AddressableLED(5);
   private Timer timer;
@@ -42,15 +41,10 @@ private final double fadeSpeed = 0.1; // Adjust this value for fade speed
     private final Autos autos = new Autos(drivetrain);
   @Override
   public void robotInit() {
-    m_robotContainer = new RobotContainer();
-  buffer = new AddressableLEDBuffer(138); // 138 LEDs
-    ledsObject.setLength(buffer.getLength());
-    ledsObject.setData(buffer);
-    ledsObject.start();
+    m_robotContainer = new RobotContainer();    
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
     // Initialize LEDs
-    leds = new Leds(ledsObject, buffer);
     autoChooser = new AutoChooser();
     autoChooser.addRoutine("Example Routine", autos::pathConnectingTest);
     // Put the auto chooser on the dashboard
@@ -88,21 +82,6 @@ private final double fadeSpeed = 0.1; // Adjust this value for fade speed
   @Override
   public void disabledPeriodic() {
     CommandScheduler.getInstance().run();
-
-    // Get the current time in seconds
-    double time = timer.get();
-    int length = buffer.getLength();
-
-    for (int i = 0; i < length; i++) {
-      // Spread hues across LEDs and animate over time
-      int hue = (int) ((time * 100 + (i * 360.0 / length)) % 360); // Adjust time multiplier for speed
-      int saturation = 255; // Full saturation
-      int value = 50;      // Full brightness
-      buffer.setLED(i, Color.fromHSV(hue, saturation, value));
-    }
-
-    // Push updated LED data to the strip
-    ledsObject.setData(buffer);
   }
 
   @Override
@@ -132,41 +111,7 @@ private final double fadeSpeed = 0.1; // Adjust this value for fade speed
 
   @Override
   public void teleopPeriodic() {
-  //   if (increasing) {
-  //     brightness += fadeSpeed;
-  //     if (brightness >= 1.0) { // Reached maximum brightness
-  //         brightness = 1.0;
-  //         increasing = false; // Start fading out
-  //     }
-  // } else {
-  //     brightness -= fadeSpeed;
-  //     if (brightness <= 0.0) { // Reached minimum brightness
-  //         brightness = 0.0;
-  //         increasing = true; // Start fading in
-  //     }
-  // }
 
-  // // Set LED colors based on brightness
-  // for (int i = 0; i < buffer.getLength(); i++) {
-  //     buffer.setLED(i, new Color(brightness, 0, 0)); // Red with variable brightness
-  // }
-  if (drivetrain.getTV()) {
-  leds.setAll(Color.kCyan);
-  }
-  else if (drivetrain.getTVFront()) {
-    leds.setAll(Color.kRed);
-  }
-  else if (drivetrain.getTVRear()) {
-    leds.setAll(Color.kForestGreen);
-  }
-  else {
-    leds.setAll(Color.kBlack);
-  }
-  // Push updated LED data to the strip
-  ledsObject.setData(buffer);
-
-  // Optionally log the brightness for debugging
-  SmartDashboard.putNumber("LED Brightness", brightness);
   }
 
   @Override

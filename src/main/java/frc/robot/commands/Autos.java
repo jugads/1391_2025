@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import org.json.simple.parser.ParseException;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
@@ -36,9 +37,10 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 public class Autos extends Command {
   AutoFactory autoFactory;
   CommandSwerveDrivetrain drivetrain;
+  SwerveRequest.RobotCentric driveRR;
   
   /** Creates a new Autos. */
-  public Autos(CommandSwerveDrivetrain drivetrain) {
+  public Autos(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric driveRR) {
      // The drive subsystem
      this.drivetrain = drivetrain;
     autoFactory = this.drivetrain.createAutoFactory();
@@ -65,8 +67,12 @@ public class Autos extends Command {
     path.resetOdometry()
     .andThen(
       new SequentialCommandGroup(
-        path.cmd(),
-        path1.cmd()
+        path.cmd(), // run first path 
+         new DriveToAprilTag(drivetrain, driveRR, -20, true, -9), // align with F branch
+        // add commands for transfering and scoring
+        path1.cmd(), // run second path 
+        new DriveToAprilTag(drivetrain, driveRR, -20, true, -9)
+        // add commands for transfering and scoring
       )
     )
     
