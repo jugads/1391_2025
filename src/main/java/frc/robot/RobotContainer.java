@@ -75,18 +75,11 @@ public class RobotContainer {
     // private final  SendableChooser<Command> autoChooser;
     // SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(drivetrain.getKinematics(), new Rotation2d(logger.getCurrentRot()), drivetrain.getModulePositions(), drivetrain.getPoseLL());
     StructPublisher<Pose2d> publisher;
-    private AutoChooser autoChooser = new AutoChooser();
-    private AutoFactory autoFactory;
-    Pose2d pose;
-    private final Autos autos = new Autos(drivetrain);
+    Autos autos = new Autos(drivetrain);
     public RobotContainer() {
     // Add options to the chooser
-    autoChooser.addRoutine("Example Routine", autos::pathConnectingTest);
-    // Put the auto chooser on the dashboard
-    SmartDashboard.putData(autoChooser);
-    // Schedule the selected auto during the autonomous period
+    
     RobotModeTriggers.autonomous().whileTrue(autos.pathConnectingTest().cmd());
-       
         // SmartDashboard.putNumber("Current Draw Climber", motor.getOutputCurrent());
         publisher = NetworkTableInstance.getDefault()
         .getStructTopic("MyPose", Pose2d.struct).publish();

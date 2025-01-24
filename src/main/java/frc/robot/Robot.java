@@ -7,6 +7,7 @@ package frc.robot;
 import choreo.Choreo.TrajectoryLogger;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -15,11 +16,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Leds;
@@ -35,9 +38,8 @@ public class Robot extends TimedRobot {
   private boolean increasing = true; // Tracks if brightness is increasing
 private double brightness = 0;     // Current brightness (0-1 range)
 private final double fadeSpeed = 0.1; // Adjust this value for fade speed
-  
-    
-
+  private AutoChooser autoChooser;
+    private final Autos autos = new Autos(drivetrain);
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
@@ -48,7 +50,14 @@ private final double fadeSpeed = 0.1; // Adjust this value for fade speed
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
     // Initialize LEDs
-    leds = new Leds(ledsObject, buffer); // PWM port 9
+    leds = new Leds(ledsObject, buffer);
+    autoChooser = new AutoChooser();
+    autoChooser.addRoutine("Example Routine", autos::pathConnectingTest);
+    // Put the auto chooser on the dashboard
+    // Shuffleboard.getTab("Autonomous").add(autoChooser);
+    SmartDashboard.putData(autoChooser);
+    // Schedule the selected auto during the autonomous period
+     // PWM port 9
     // Initialize timer for animation
     // Create the auto chooser
 

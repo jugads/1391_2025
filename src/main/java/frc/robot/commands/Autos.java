@@ -64,9 +64,10 @@ public class Autos extends Command {
   autoRoutine.active().onTrue(
     path.resetOdometry()
     .andThen(
-      path.cmd(),
-      path1.cmd(),
-      path2.cmd()
+      new SequentialCommandGroup(
+        path.cmd(),
+        path1.cmd()
+      )
     )
     
   );
