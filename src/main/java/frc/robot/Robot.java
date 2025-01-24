@@ -43,7 +43,6 @@ private final double fadeSpeed = 0.1; // Adjust this value for fade speed
     m_robotContainer = new RobotContainer();    
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
-    // Initialize LEDs
     // Put the auto chooser on the dashboard
     // Shuffleboard.getTab("Autonomous").add(autoChooser);
     SmartDashboard.putData(autoChooser);
