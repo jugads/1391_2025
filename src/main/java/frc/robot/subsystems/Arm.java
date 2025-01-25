@@ -10,18 +10,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.ArmConstants.*;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class Arm extends SubsystemBase {
   // Hardware components for controlling the robot's arm mechanism
   SparkMax motor;
-  DutyCycleEncoder encoder;
+  AbsoluteEncoder encoder;
 
   // Constructor initializes motor and encoder with specified ports from Constants
   public Arm() {
     motor = new SparkMax(kMotorID, MotorType.kBrushless); 
-    encoder = new DutyCycleEncoder(kEncoderPort);
+    encoder = motor.getAbsoluteEncoder();
   }
 
   // Periodic method runs repeatedly, updates dashboard with arm status
@@ -44,7 +45,7 @@ public class Arm extends SubsystemBase {
 
   // Converts encoder reading to degrees (0-360)
   public double getEncoderPosition() {
-    return (encoder.get()) *360;
+    return (encoder.getPosition()) *360;
   }
 
   // Checks if arm is at the transfer position (0 degrees)

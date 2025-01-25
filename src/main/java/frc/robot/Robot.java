@@ -64,7 +64,7 @@ private final double fadeSpeed = 0.1; // Adjust this value for fade speed
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run(); 
-    m_robotContainer.getInput();
+    m_robotContainer.publishPose();
   }
 
   @Override

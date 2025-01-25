@@ -16,14 +16,14 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class Elevator extends SubsystemBase {
   // Hardware components for controlling the elevator's vertical movement
-  SparkMax leftMotor = new SparkMax(kMotorID, MotorType.kBrushless);
-  SparkMax rightMotor = new SparkMax(kOtherMotorID, MotorType.kBrushless);
+  SparkMax leftMotor = new SparkMax(kLeftMotorID, MotorType.kBrushless);
+  SparkMax rightMotor = new SparkMax(kRightMotorID, MotorType.kBrushless);
   
   // Limit switches to detect when elevator reaches its boundaries
-  DigitalInput downSwitch = new DigitalInput(kDownLimitPort);
-  DigitalInput upSwitch = new DigitalInput(kUpLimitPort);
 
-  public Elevator() {}
+  public Elevator() {
+
+  }
 
   // Periodically updates SmartDashboard with elevator status information
   @Override
@@ -35,18 +35,17 @@ public class Elevator extends SubsystemBase {
 
   // Returns true when elevator is at bottom position
   public boolean getElevatorDown() {
-    return downSwitch.get();
+    return leftMotor.getForwardLimitSwitch().isPressed();
   }
 
   // Returns true when elevator is at top position
   public boolean getElevatorUp() {
-    return upSwitch.get();
+    return rightMotor.getReverseLimitSwitch().isPressed();
   }
 
   // Controls elevator movement using dual motors for balanced lifting
   public void runElevatorUp(double speed) {
     leftMotor.set(speed);
-    rightMotor.set(speed);
   }
 
   // Returns current elevator position using left motor's encoder

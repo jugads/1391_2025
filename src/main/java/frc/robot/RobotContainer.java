@@ -31,29 +31,45 @@ import com.revrobotics.spark.SparkMax;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.AlgaeScorer;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Chute;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Knuckle;
 public class RobotContainer {
-    DigitalInput input = new DigitalInput(9);
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); 
+    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
+
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     // private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+
     private final Telemetry logger = new Telemetry(MaxSpeed);
+
     private final RobotCentric driveRR = new SwerveRequest.RobotCentric()
     .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); 
+
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final Joystick buttons = new Joystick(1);
-    private final SparkMax motor = new SparkMax(3, MotorType.kBrushless);
+
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     // private final  SendableChooser<Command> autoChooser;
     // SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(drivetrain.getKinematics(), new Rotation2d(logger.getCurrentRot()), drivetrain.getModulePositions(), drivetrain.getPoseLL());
     StructPublisher<Pose2d> publisher;
+
+    Arm arm = new Arm();
+    AlgaeScorer algaeScorer = new AlgaeScorer();
+    Chute chute = new Chute();
+    Elevator elevator = new Elevator();
+    Knuckle knuckle = new Knuckle();
+
     Autos autos = new Autos(drivetrain, driveRR);
+
     public RobotContainer() {
     // Add options to the chooser
     
@@ -63,14 +79,11 @@ public class RobotContainer {
         .getStructTopic("MyPose", Pose2d.struct).publish();
         configureBindings();
         }
-    public void getInput() {
-        
-        
+    public void publishPose() {
         publisher.set(drivetrain.getPose());
     }
 
     private void configureBindings() {
-        System.out.println(input.get());
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
@@ -101,26 +114,7 @@ public class RobotContainer {
             () -> drivetrain.resetGyro(0)
           )  
         );
-        joystick.povUp().whileTrue(
-            new RunCommand(
-              () -> motor.set(0.15)
-            )
-          );
-          joystick.povDown().whileTrue(
-            new RunCommand(
-              () -> motor.set(-0.15)
-            )
-          );
-        joystick.povUp().whileFalse(
-            new RunCommand(
-                () -> motor.set(0.)
-            )
-        );
-        joystick.povDown().whileFalse(
-            new RunCommand(
-                () -> motor.set(0.)
-            )
-        );
+      
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
         joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
