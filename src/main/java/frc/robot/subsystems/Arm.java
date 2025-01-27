@@ -17,12 +17,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 public class Arm extends SubsystemBase {
   // Hardware components for controlling the robot's arm mechanism
   SparkMax motor;
-  AbsoluteEncoder encoder;
+  DutyCycleEncoder encoder;
 
   // Constructor initializes motor and encoder with specified ports from Constants
   public Arm() {
     motor = new SparkMax(kMotorID, MotorType.kBrushless); 
-    encoder = motor.getAbsoluteEncoder();
+    encoder = new DutyCycleEncoder(kEncoderPort);
   }
 
   // Periodic method runs repeatedly, updates dashboard with arm status
@@ -30,6 +30,8 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Arm Angle", getEncoderPosition());
     SmartDashboard.putBoolean("Arm at Transfer Height", atTransferAngle());
+    SmartDashboard.putNumber("Arm Speed Motor", motor.get());
+    SmartDashboard.putNumber("Arm current draw", motor.getOutputCurrent());
     // This method will be called once per scheduler run
   }
 
@@ -45,11 +47,11 @@ public class Arm extends SubsystemBase {
 
   // Converts encoder reading to degrees (0-360)
   public double getEncoderPosition() {
-    return (encoder.getPosition()) *360;
+    return (encoder.get());
   }
 
   // Checks if arm is at the transfer position (0 degrees)
   public boolean atTransferAngle() {
-    return getEncoderPosition() == 0;
+    return Math.abs(getEncoderPosition() - kTransferAngle) <= 3;
   }
 }

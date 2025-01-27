@@ -14,6 +14,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -25,7 +27,11 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveToAprilTag;
+import frc.robot.commands.ElevatorDefaultCommand;
+import frc.robot.commands.KnuckleDefault;
+import frc.robot.commands.MoveArm;
 import frc.robot.commands.RotateToAprilTag;
+import frc.robot.commands.RunElevator;
 
 import com.revrobotics.spark.SparkMax;
 
@@ -37,6 +43,7 @@ import frc.robot.subsystems.Chute;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Knuckle;
+import frc.robot.subsystems.Leds;
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); 
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
@@ -64,10 +71,10 @@ public class RobotContainer {
 
     Arm arm = new Arm();
     AlgaeScorer algaeScorer = new AlgaeScorer();
-    Chute chute = new Chute();
+    // Chute chute = new Chute();
     Elevator elevator = new Elevator();
     Knuckle knuckle = new Knuckle();
-
+    Leds leds = new Leds(new AddressableLED(5), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer);
     Autos autos = new Autos(drivetrain, driveRR);
 
     public RobotContainer() {
@@ -96,6 +103,13 @@ public class RobotContainer {
                 .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
+        elevator.setDefaultCommand(
+            new ElevatorDefaultCommand(elevator)
+        );
+        knuckle.setDefaultCommand(
+            new KnuckleDefault(knuckle)
+        );
+        arm.setDefaultCommand(new MoveArm(arm, 0.));
         joystick.rightBumper().whileTrue(
             drivetrain.applyRequest(
                 () -> 
@@ -131,6 +145,10 @@ public class RobotContainer {
                 new RotateToAprilTag(drivetrain, driveRR, 2)
             )
         );
+        joystick.rightTrigger().whileTrue(new RunElevator(elevator, 0.2));
+        joystick.leftTrigger().whileTrue(new RunElevator(elevator, -0.2));
+        joystick.y().whileTrue(new MoveArm(arm,0.2));
+        joystick.a().onTrue(new InstantCommand(() -> knuckle.alterState("searching"), knuckle));
         joystick.a().and(joystick.povRight()).whileTrue(
             new DriveToAprilTag(drivetrain, driveRR, -20, true, -9)
         );

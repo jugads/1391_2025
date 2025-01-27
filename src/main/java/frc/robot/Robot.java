@@ -30,22 +30,14 @@ import frc.robot.subsystems.Leds;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-  private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-  private AddressableLEDBuffer buffer;
-  private AddressableLED ledsObject = new AddressableLED(5);
-  private Timer timer;
-  private boolean increasing = true; // Tracks if brightness is increasing
-private double brightness = 0;     // Current brightness (0-1 range)
-private final double fadeSpeed = 0.1; // Adjust this value for fade speed
-  private AutoChooser autoChooser;
+ // Adjust this value for fade speed
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();    
-    DataLogManager.start();
-    DriverStation.startDataLog(DataLogManager.getLog());
+    // DataLogManager.start();
+    // DriverStation.startDataLog(DataLogManager.getLog());
     // Put the auto chooser on the dashboard
     // Shuffleboard.getTab("Autonomous").add(autoChooser);
-    SmartDashboard.putData(autoChooser);
     // Schedule the selected auto during the autonomous period
      // PWM port 9
     // Initialize timer for animation
@@ -69,9 +61,6 @@ private final double fadeSpeed = 0.1; // Adjust this value for fade speed
 
   @Override
   public void disabledInit() {
-    timer = new Timer();
-    timer.start();
-    
     // DataLog log = DataLogManager.getLog();
   }
 

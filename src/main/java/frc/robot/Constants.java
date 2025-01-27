@@ -7,9 +7,9 @@ public class Constants {
     }
     public class KnuckleConstants {
         public static final int kMotorID = 5;
-        public static final double kCurrentThreshold = 30;
-        public static final double kHighSpeed = 1.0;
-        public static final double kLowSpeed = 0.1;
+        public static final double kCurrentThreshold = 75;
+        public static final double kHighSpeed = -0.5;
+        public static final double kLowSpeed = -0.01;
     }
     public class ChuteConstants {
         public static final int kMotorID = 8;
@@ -31,9 +31,10 @@ public class Constants {
     }
     public class ArmConstants{
         public static final int kMotorID = 3;
-        // public static final int kEncoderPort = 0;
+        public static final int kEncoderPort = 0;
         public static final double kP = 0;
         public static final double kI = 0;
         public static final double kD = 0;
+        public static final double kTransferAngle = -90;
     }
 }

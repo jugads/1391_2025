@@ -72,7 +72,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Pose2d lastPose;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
-    SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(getKinematics(), getPigeon2().getRotation2d(), getModulePositions(), getFrontLLPose());
+    SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(getKinematics(), getPigeon2().getRotation2d(), getModulePositions(), getRearLLPose());
     private final SwerveRequest.ApplyRobotSpeeds m_ApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
     /* Swerve requests to apply during SysId characterization */
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
@@ -341,13 +341,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void periodic() {
         poseEstimator.update(getPigeon2().getRotation2d(), getModulePositions());
         if (!DriverStation.isAutonomous()) {
-        if (getTVFront()) {
-            poseEstimator.resetPose(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()));
-            lastPose = new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d());
-        }
-        else if (getTV()) {
-            poseEstimator.resetPose(new Pose2d(getPoseLL().getTranslation(), getPigeon2().getRotation2d()));
-        }
+        // if (getTVFront()) {
+        //     poseEstimator.resetPose(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()));
+        //     // lastPose = new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d());
+        // }
+        // else if (getTV()) {
+        //     poseEstimator.resetPose(new Pose2d(getPoseLL().getTranslation(), getPigeon2().getRotation2d()));
+        // }
     }
         // if (getFrontLLPose().getRotation().getDegrees() - getPose().getRotation().getDegrees() > 90) {
         //     getPigeon2().setYaw(getFrontLLPose().getRotation().getDegrees());

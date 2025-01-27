@@ -15,7 +15,7 @@ public class Leds extends SubsystemBase {
   /** Creates a new Leds. */
   AddressableLED leds;
   AddressableLEDBuffer buffer;
-  Timer timer;
+  Timer timer = new Timer();
   Arm arm;
   AlgaeScorer algaeScorer;
   Knuckle knuckle;

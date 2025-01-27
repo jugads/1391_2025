@@ -22,7 +22,6 @@ public class Elevator extends SubsystemBase {
   // Limit switches to detect when elevator reaches its boundaries
 
   public Elevator() {
-
   }
 
   // Periodically updates SmartDashboard with elevator status information
@@ -31,6 +30,12 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putBoolean("Elevator Down", getElevatorDown());
     SmartDashboard.putBoolean("Elevator Up", getElevatorUp());
     SmartDashboard.putNumber("Elevator Position", getElevatorPosition());
+    SmartDashboard.putNumber("Right Motor running", rightMotor.get());
+    SmartDashboard.putNumber("Left Motor running", leftMotor.get());
+    SmartDashboard.putBoolean("Following", rightMotor.isFollower());
+    if (getElevatorDown()) {
+      leftMotor.getEncoder().setPosition(0);
+    }
   }
 
   // Returns true when elevator is at bottom position
@@ -40,14 +45,15 @@ public class Elevator extends SubsystemBase {
 
   // Returns true when elevator is at top position
   public boolean getElevatorUp() {
-    return rightMotor.getReverseLimitSwitch().isPressed();
+    return leftMotor.getReverseLimitSwitch().isPressed();
   }
 
   // Controls elevator movement using dual motors for balanced lifting
   public void runElevatorUp(double speed) {
+    speed *= -1;
     leftMotor.set(speed);
+    rightMotor.set(-speed);
   }
-
   // Returns current elevator position using left motor's encoder
   public double getElevatorPosition() {
     return leftMotor.getEncoder().getPosition();

@@ -16,7 +16,7 @@ import static frc.robot.Constants.KnuckleConstants.*;
 public class Knuckle extends SubsystemBase {
   // Motor controller for the knuckle mechanism
   SparkMax motor;
-
+  String state = "null";
   // Constructor initializes the brushless motor with specified ID
   public Knuckle() {
     motor = new SparkMax(kMotorID, MotorType.kBrushless);
@@ -25,7 +25,17 @@ public class Knuckle extends SubsystemBase {
   // Continuously updates SmartDashboard with coral detection status
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Coral Detected", hasCoral());
+    if (state=="searching") {
+      setKnuckleMotorHigh();
+    }
+    else if (state=="has coral") {
+      setKnuckleMotorLow();
+    }
+    else {
+      stopMotor();
+    }
+    SmartDashboard.putString("Coral State", getState());
+    SmartDashboard.putNumber("Coral Gripper Current", motor.getOutputCurrent());
     // This method will be called once per scheduler run
   }
 
@@ -33,22 +43,25 @@ public class Knuckle extends SubsystemBase {
   public void setKnuckleMotorHigh() {
     motor.set(kHighSpeed);
   }
-
+  public boolean hasCoral() {
+    return motor.getReverseLimitSwitch().isPressed();
+  }
   // Sets the knuckle motor to run at a predefined low speed
   public void setKnuckleMotorLow() {
     motor.set(kLowSpeed);
-  }
+    }
 
   // Retrieves the current draw from the motor for coral detection
   public double getCurrent() {
     return motor.getOutputCurrent();
   }
 
-  // Determines if coral is present based on motor current threshold
-  public boolean hasCoral() {
-    return getCurrent() > kCurrentThreshold;
+  public String getState() {
+    return state;
   }
-  
+  public void alterState(String newState) {
+    state = newState;
+  }
   public void stopMotor() {
     motor.set(0);
   }
