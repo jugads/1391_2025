@@ -8,19 +8,18 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import static frc.robot.Constants.ArmConstants.*;
-
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ArmToAngle extends Command {
-  /** Creates a new ArmToAngle. */
-  PIDController controller;
-  Arm m_arm;
-  double desiredArmAngle;
-
-  public ArmToAngle(Arm arm, double angle) {
-    controller = new PIDController(kP,kI,kD);
-    m_arm = arm;
-    desiredArmAngle = angle;
-    addRequirements(arm);
+    /** Creates a new ArmToAngle. */
+    PIDController controller;
+    Arm m_arm;
+    double desiredArmAngle;
+    public ArmToAngle(Arm arm, double armAngle) {
+      desiredArmAngle = armAngle;
+      m_arm = arm;
+      controller = new PIDController(kPDynamic, kIDynamic, kDDynamic);
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_arm);
   }
 
   // Called when the command is initially scheduled.
@@ -32,12 +31,14 @@ public class ArmToAngle extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-  m_arm.runMotor(controller.calculate(m_arm.getEncoderPosition()));
+    m_arm.runMotor(controller.calculate(m_arm.getEncoderPosition()));
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_arm.stop();
+  }
 
   // Returns true when the command should end.
   @Override

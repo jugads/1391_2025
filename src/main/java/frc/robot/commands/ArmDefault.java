@@ -4,32 +4,37 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Knuckle;
+import frc.robot.subsystems.Arm;
+import static frc.robot.Constants.ArmConstants.*;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class KnuckleDefault extends Command {
-  /** Creates a new KnuckleDefault. */
-  Knuckle knuckle;
-  public KnuckleDefault(Knuckle knuckle) {
-    this.knuckle = knuckle;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(knuckle);
+public class ArmDefault extends Command {
+  /** Creates a new ArmToAngle. */
+  PIDController controller;
+  Arm m_arm;
+  double desiredArmAngle;
+
+  public ArmDefault(Arm arm, double angle) {
+    controller = new PIDController(kP,kI,kD);
+    m_arm = arm;
+    desiredArmAngle = angle;
+    addRequirements(arm);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (knuckle.hasCoral()) {
-      knuckle.setKnuckleMotorLow();
-    }
-    else {
-      knuckle.setKnuckleMotorHigh();
-    }
+    SmartDashboard.putNumber("Arm Controller", -controller.calculate(m_arm.getEncoderPosition()));
+  m_arm.runMotor((Math.sin(Math.toRadians(m_arm.getEncoderPosition())))* (-controller.calculate(m_arm.getEncoderPosition(), m_arm.getEncoderPosition())));
   }
 
   // Called once the command ends or is interrupted.
@@ -39,6 +44,6 @@ public class KnuckleDefault extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return controller.atSetpoint();
   }
 }

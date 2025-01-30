@@ -6,7 +6,9 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.ElevatorConstants.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -18,10 +20,12 @@ public class Elevator extends SubsystemBase {
   // Hardware components for controlling the elevator's vertical movement
   SparkMax leftMotor = new SparkMax(kLeftMotorID, MotorType.kBrushless);
   SparkMax rightMotor = new SparkMax(kRightMotorID, MotorType.kBrushless);
-  
+  double kStallSpeed = 0.;
+  DutyCycleEncoder encoder = new DutyCycleEncoder(4);
   // Limit switches to detect when elevator reaches its boundaries
 
   public Elevator() {
+    encoder.setInverted(true);
   }
 
   // Periodically updates SmartDashboard with elevator status information
@@ -33,8 +37,9 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Right Motor running", rightMotor.get());
     SmartDashboard.putNumber("Left Motor running", leftMotor.get());
     SmartDashboard.putBoolean("Following", rightMotor.isFollower());
+    SmartDashboard.putNumber("Elevator Stall Speed", kStallSpeed);
     if (getElevatorDown()) {
-      leftMotor.getEncoder().setPosition(0);
+      leftMotor.getEncoder().setPosition(0.);
     }
   }
 
@@ -56,6 +61,16 @@ public class Elevator extends SubsystemBase {
   }
   // Returns current elevator position using left motor's encoder
   public double getElevatorPosition() {
-    return leftMotor.getEncoder().getPosition();
+    return MathUtil.clamp(((-leftMotor.getEncoder().getPosition())/16.9), 0., 1.);
+  }
+  public double getStallCurrent() {
+    return kStallSpeed;
+  }
+  public void increaseStall() {
+    kStallSpeed += 0.001;
+  }
+  public void stallElevator() {
+    leftMotor.set(kStallSpeed);
+    rightMotor.set(-kStallSpeed);
   }
 }

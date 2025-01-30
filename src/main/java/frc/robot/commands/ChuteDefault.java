@@ -5,16 +5,16 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Knuckle;
+import frc.robot.subsystems.Chute;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class KnuckleDefault extends Command {
-  /** Creates a new KnuckleDefault. */
-  Knuckle knuckle;
-  public KnuckleDefault(Knuckle knuckle) {
-    this.knuckle = knuckle;
+public class ChuteDefault extends Command {
+  /** Creates a new ChuteDefault. */
+  Chute chute;
+  public ChuteDefault(Chute chute) {
+    this.chute = chute;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(knuckle);
+    addRequirements(chute);
   }
 
   // Called when the command is initially scheduled.
@@ -24,12 +24,7 @@ public class KnuckleDefault extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (knuckle.hasCoral()) {
-      knuckle.setKnuckleMotorLow();
-    }
-    else {
-      knuckle.setKnuckleMotorHigh();
-    }
+    chute.stopMotor();
   }
 
   // Called once the command ends or is interrupted.
