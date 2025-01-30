@@ -171,9 +171,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // Handle exception as needed
         e.printStackTrace();
         }
+        
+        configureAutoBuilder();
 
     }
-        //configureAutoBuilder();
+        
         
 
     /**
@@ -198,7 +200,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        //configureAutoBuilder();
+        configureAutoBuilder();
     }
 
 
@@ -232,7 +234,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        //configureAutoBuilder();
+        configureAutoBuilder();
     }
 
     private void configureAutoBuilder() {
@@ -247,8 +249,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
                                 ), 
                                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                                new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                                new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                                new PIDConstants(10.0, 0.0, 0.0), // Translation PID constants
+                                new PIDConstants(7.0, 0.0, 0.0) // Rotation PID constants
             ), 
                                 config, 
                                 () -> {

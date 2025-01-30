@@ -6,9 +6,15 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.List;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.RobotCentric;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -54,9 +60,28 @@ public class RobotContainer {
     // SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(drivetrain.getKinematics(), new Rotation2d(logger.getCurrentRot()), drivetrain.getModulePositions(), drivetrain.getPoseLL());
     StructPublisher<Pose2d> publisher;
     Autos autos = new Autos(drivetrain, driveRR);
+
+
+
+
+    List<Waypoint> waypoints =
+      PathPlannerPath.waypointsFromPoses(
+          new Pose2d(1.0, 1.0, Rotation2d.fromDegrees(0)),
+          new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
+          new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90)));
+
+    PathConstraints constraints =
+        new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+    // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); // You can also use
+    // unlimited constraints, only limited by motor torque and nominal battery voltage
+
+    Pose2d targetPose = new Pose2d(8, 5, Rotation2d.fromDegrees(180));
+
+
+
     public RobotContainer() {
     // Add options to the chooser
-    
+
     RobotModeTriggers.autonomous().whileTrue(autos.pathConnectingTest().cmd());
         // SmartDashboard.putNumber("Current Draw Climber", motor.getOutputCurrent());
         publisher = NetworkTableInstance.getDefault()
@@ -143,6 +168,14 @@ public class RobotContainer {
         joystick.a().and(joystick.povLeft()).whileTrue(
             new DriveToAprilTag(drivetrain, driveRR, 15, true, -7)
         );
+
+        joystick.a().onTrue(AutoBuilder.pathfindToPose(
+            targetPose,
+            constraints,
+            0.0 // Rotation delay distance in meters. This is how far the robot should travel
+            // before attempting to rotate.
+            ));
+
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
