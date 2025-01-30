@@ -19,12 +19,14 @@ public class Leds extends SubsystemBase {
   Arm arm;
   AlgaeScorer algaeScorer;
   Knuckle knuckle;
-  public Leds(AddressableLED leds, AddressableLEDBuffer buffer, Arm arm, Knuckle knuckle, AlgaeScorer algaeScorer) {
+  Chute chute;
+  public Leds(AddressableLED leds, AddressableLEDBuffer buffer, Arm arm, Knuckle knuckle, AlgaeScorer algaeScorer, Chute chute) {
     this.leds = leds;
     this.buffer = buffer;
     this.arm = arm;
     this.algaeScorer = algaeScorer;
     this.knuckle = knuckle;
+    this.chute = chute;
     timer.start();
     leds.setLength(buffer.getLength());
     leds.setData(buffer);
@@ -56,7 +58,16 @@ public class Leds extends SubsystemBase {
       setAll(Color.kWhiteSmoke);
     }
     else if (algaeScorer.hasAlgae()) {
-      setAll(Color.kAqua);
+      setAll(Color.kMediumAquamarine);
+    }
+    else if (chute.hasCoral()) {
+      flash(Color.kWhiteSmoke);
+    }
+    else if (knuckle.hasCoral() && algaeScorer.hasAlgae()) {
+      setAll(Color.kChartreuse);
+    }
+    else {
+      flash(Color.kBlue);
     }
   }
     // This method will be called once per scheduler run

@@ -5,16 +5,17 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Knuckle;
+import frc.robot.subsystems.AlgaeScorer;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class KnuckleDefault extends Command {
-  /** Creates a new KnuckleDefault. */
-  Knuckle knuckle;
-  public KnuckleDefault(Knuckle knuckle) {
-    this.knuckle = knuckle;
+public class AlgaeDefault extends Command {
+  /** Creates a new AlgaeDefault. */
+  AlgaeScorer algae;
+  public AlgaeDefault(AlgaeScorer algae) {
+    this.algae = algae;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(knuckle);
+    addRequirements(algae);
   }
 
   // Called when the command is initially scheduled.
@@ -24,11 +25,11 @@ public class KnuckleDefault extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (knuckle.hasCoral()) {
-      knuckle.setKnuckleMotorLow();
+    if (algae.hasAlgae()) {
+      algae.runAlgaeScorer(0.4);
     }
     else {
-      knuckle.setKnuckleMotorHigh();
+      algae.stopMotor();
     }
   }
 

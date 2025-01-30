@@ -25,6 +25,7 @@ public class AlgaeScorer extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putBoolean("Has Algae", hasAlgae());
+    SmartDashboard.putNumber("Algae current", motor.getOutputCurrent());
     // This method will be called once per scheduler run
   }
 
@@ -45,6 +46,6 @@ public class AlgaeScorer extends SubsystemBase {
 
   // Determines if algae is present based on motor current threshold
   public boolean hasAlgae() {
-    return getAlgaeScorerCurrent() < kCurrentThreshold;
+    return getAlgaeScorerCurrent() > kCurrentThreshold;
   }
 }

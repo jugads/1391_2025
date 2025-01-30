@@ -47,7 +47,7 @@ public class Arm extends SubsystemBase {
 
   // Converts encoder reading to degrees (0-360)
   public double getEncoderPosition() {
-    return (encoder.get());
+    return (encoder.get())*360;
   }
 
   // Checks if arm is at the transfer position (0 degrees)
