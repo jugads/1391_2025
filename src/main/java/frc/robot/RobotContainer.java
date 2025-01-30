@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.RobotCentric;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -84,6 +86,9 @@ public class RobotContainer {
     Leds leds = new Leds(new AddressableLED(5), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer, chute);
     Autos autos = new Autos(drivetrain, driveRR);
 
+    PathConstraints constraints = new PathConstraints(3.0, 3.0, 2*Math.PI, 4*Math.PI);
+    Pose2d targetPose = new Pose2d(8,5,Rotation2d.fromDegrees(180));
+
     public RobotContainer() {
     // Add options to the chooser
     
@@ -157,6 +162,7 @@ public class RobotContainer {
         joystick.b().whileTrue(new RunCommand(() -> algaeScorer.runAlgaeScorer(-1.)));
         
         
+        
 
 
         //OPERATOR --------------------------------------------------------------------
@@ -165,6 +171,7 @@ public class RobotContainer {
         operator.rightBumper().onTrue(new InstantCommand(() -> elevator.increaseStall(), elevator));
         operator.rightTrigger().whileTrue(new RunCommand(() -> arm.runMotor(0.1), arm));
         operator.leftTrigger().whileTrue(new RunCommand(() -> arm.runMotor(-0.05), arm));
+        operator.a().onTrue(AutoBuilder.pathfindToPose(targetPose, constraints, 0.0));
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
