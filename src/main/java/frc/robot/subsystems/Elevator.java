@@ -7,7 +7,9 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.ElevatorConstants.*;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,6 +29,7 @@ public class Elevator extends SubsystemBase {
 
   public Elevator() {
     encoder.setInverted(true);
+    encoder.setInverted(true);
   }
 
   // Periodically updates SmartDashboard with elevator status information
@@ -39,7 +42,9 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Left Motor running", leftMotor.get());
     SmartDashboard.putBoolean("Following", rightMotor.isFollower());
     SmartDashboard.putNumber("Elevator Stall Speed", kStallSpeed);
+    SmartDashboard.putNumber("Elevator Stall Speed", kStallSpeed);
     if (getElevatorDown()) {
+      leftMotor.getEncoder().setPosition(0.);
       leftMotor.getEncoder().setPosition(0.);
     }
   }

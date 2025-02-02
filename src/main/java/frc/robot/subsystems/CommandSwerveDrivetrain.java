@@ -175,6 +175,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
         
         
+        
 
     /**
      * Constructs a CTRE SwerveDrivetrain using the specified constants.
@@ -247,6 +248,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
                                 ), 
                                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                                new PIDConstants(10.0, 0.0, 0.0), // Translation PID constants
+                                new PIDConstants(7.0, 0.0, 0.0) // Rotation PID constants
                                 new PIDConstants(10.0, 0.0, 0.0), // Translation PID constants
                                 new PIDConstants(7.0, 0.0, 0.0) // Rotation PID constants
             ), 

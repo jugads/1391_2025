@@ -11,11 +11,15 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Chute extends SubsystemBase {
   // Motor controller for the chute mechanism
   SparkMax motor;
+  DigitalInput beamBreak  = new DigitalInput(kBeamBreakPort);
+  double coralCount = 0;
   DigitalInput beamBreak  = new DigitalInput(kBeamBreakPort);
   double coralCount = 0;
   // Constructor initializes the chute's brushless motor with specified ID
@@ -26,6 +30,14 @@ public class Chute extends SubsystemBase {
   // Periodic method runs repeatedly - currently empty but available for future monitoring
   @Override
   public void periodic() {
+    if (!beamBreak.get()) {
+      coralCount ++;
+    }
+    if (coralCount > 3 && beamBreak.get()) {
+      coralCount = 0;
+    }
+    SmartDashboard.putBoolean("Chute has coral", hasCoral());
+    SmartDashboard.putNumber("Coral Count", coralCount);
     if (!beamBreak.get()) {
       coralCount ++;
     }

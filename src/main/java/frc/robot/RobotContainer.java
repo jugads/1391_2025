@@ -11,6 +11,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.RobotCentric;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,6 +26,7 @@ import edu.wpi.first.wpilibj.ADXL345_I2C.AllAxes;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -34,13 +37,18 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.AlgaeDefault;
 import frc.robot.commands.ArmDefault;
 import frc.robot.commands.ArmToAngle;
+import frc.robot.commands.AlgaeDefault;
+import frc.robot.commands.ArmDefault;
+import frc.robot.commands.ArmToAngle;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveToAprilTag;
+import frc.robot.commands.ElevatorDefault;
 import frc.robot.commands.ElevatorDefault;
 import frc.robot.commands.KnuckleDefault;
 import frc.robot.commands.MoveArm;
 import frc.robot.commands.RotateToAprilTag;
 import frc.robot.commands.RunElevator;
+import frc.robot.commands.Transfer;
 import frc.robot.commands.Transfer;
 
 import com.revrobotics.spark.SparkMax;
@@ -73,6 +81,7 @@ public class RobotContainer {
 
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController operator = new CommandXboxController(1);
+    private final CommandXboxController operator = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     // private final  SendableChooser<Command> autoChooser;
@@ -86,7 +95,12 @@ public class RobotContainer {
     Knuckle knuckle = new Knuckle();
     Chute chute = new Chute();
     Leds leds = new Leds(new AddressableLED(5), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer, chute);
+    Chute chute = new Chute();
+    Leds leds = new Leds(new AddressableLED(5), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer, chute);
     Autos autos = new Autos(drivetrain, driveRR);
+
+    PathConstraints constraints = new PathConstraints(3.0, 3.0, 2*Math.PI, 4*Math.PI);
+    Pose2d targetPose = new Pose2d(8,5,Rotation2d.fromDegrees(180));
 
     PathConstraints constraints = new PathConstraints(3.0, 3.0, 2*Math.PI, 4*Math.PI);
     Pose2d targetPose = new Pose2d(8,5,Rotation2d.fromDegrees(180));
@@ -142,6 +156,9 @@ public class RobotContainer {
             )
         );
         // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        // ));
         // joystick.b().whileTrue(drivetrain.applyRequest(() ->
         //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         // ));
