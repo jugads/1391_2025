@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -12,8 +13,10 @@ public class RunElevator extends Command {
   /** Creates a new RunElevator. */
   Elevator elevator;
   double speed;
-  public RunElevator(Elevator elevator, double speed) {
+  Arm arm;
+  public RunElevator(Elevator elevator, double speed, Arm arm) {
     this.elevator = elevator;
+    this.arm = arm;
     this.speed = speed;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(elevator);
@@ -26,7 +29,7 @@ public class RunElevator extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    elevator.runElevatorUp(speed);
+    elevator.runElevatorUp(speed, arm);
   }
 
   // Called once the command ends or is interrupted.

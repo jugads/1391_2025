@@ -4,9 +4,11 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import static frc.robot.Constants.ElevatorConstants.*;
 
@@ -16,10 +18,12 @@ public class ElevatorDefault extends Command {
   private final Elevator elevator;  
   // PID controller for height control
   private final PIDController pidController;
-
+  double speed = 0;
+  Arm arm;
   /** Creates a new ElevatorToHeight command. */
-  public ElevatorDefault(Elevator elevator) {
+  public ElevatorDefault(Elevator elevator, Arm arm) {
     this.elevator = elevator;    
+    this.arm = arm;
     // Initialize PID controller with constants from Constants file
     this.pidController = new PIDController(kP, kI, kD);    
     // Require the elevator subsystem
@@ -29,15 +33,16 @@ public class ElevatorDefault extends Command {
   // Called when the command is initially scheduled
   @Override
   public void initialize() {
-    
+    pidController.setTolerance(0.0013157);
   }
 
   // Called every time the scheduler runs while the command is scheduled
   @Override
   public void execute() {
-    double speed = pidController.calculate(elevator.getElevatorPosition(), elevator.getElevatorPosition());
+    speed = MathUtil.clamp(pidController.calculate(elevator.getElevatorPosition(), elevator.getSetpoint()), -0.3, 0.5);
     SmartDashboard.putNumber("Controller output", speed);
-    // elevator.runElevatorUp(speed);
+    SmartDashboard.putNumber("Setpoint", elevator.getSetpoint());
+    elevator.runElevatorUp(speed, arm);
   }
 
   // Called once the command ends or is interrupted

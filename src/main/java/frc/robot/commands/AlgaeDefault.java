@@ -25,12 +25,7 @@ public class AlgaeDefault extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (algae.hasAlgae()) {
-      algae.runAlgaeScorer(0.4);
-    }
-    else {
-      algae.stopMotor();
-    }
+    algae.stopMotor();
   }
 
   // Called once the command ends or is interrupted.

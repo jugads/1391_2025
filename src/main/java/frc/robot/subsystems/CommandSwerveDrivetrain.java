@@ -171,7 +171,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // Handle exception as needed
         e.printStackTrace();
         }
-        configureAutoBuilder();
+        // configureAutoBuilder();
     }
         
         
@@ -198,7 +198,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        configureAutoBuilder();
+        // configureAutoBuilder();
     }
 
 
@@ -232,7 +232,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        configureAutoBuilder();
+        // configureAutoBuilder();
     }
 
     private void configureAutoBuilder() {
@@ -503,8 +503,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         var newY = (accelY * Math.pow(Utils.getCurrentTimeSeconds(), 2))/2;
         return new Pose2d(newX, newY, getPigeon2().getRotation2d());
       }
-      public Command FollowPathCommand(PathPlannerPath path) {
-        configureAutoBuilder();
+    //   public Command FollowPathCommand(PathPlannerPath path) {
+        // configureAutoBuilder();
 
         //PathConstraints constraints = new PathConstraints(
         //3.0, 4.0,
@@ -520,6 +520,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // );
 
 
-        return AutoBuilder.followPath(path); }
+        // return AutoBuilder.followPath(path); }
         
 }

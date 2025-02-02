@@ -47,6 +47,6 @@ public class Chute extends SubsystemBase {
   }
 
   public boolean hasCoral() {
-    return !beamBreak.get();
+    return coralCount > 5;
   }
 }

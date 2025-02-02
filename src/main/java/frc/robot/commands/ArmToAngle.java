@@ -26,6 +26,7 @@ public class ArmToAngle extends Command {
   @Override
   public void initialize() {
     controller.setSetpoint(desiredArmAngle);
+    controller.setTolerance(3.);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

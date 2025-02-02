@@ -22,6 +22,7 @@ public class Elevator extends SubsystemBase {
   SparkMax rightMotor = new SparkMax(kRightMotorID, MotorType.kBrushless);
   double kStallSpeed = 0.;
   DutyCycleEncoder encoder = new DutyCycleEncoder(4);
+  double setpoint = 0;
   // Limit switches to detect when elevator reaches its boundaries
 
   public Elevator() {
@@ -52,12 +53,28 @@ public class Elevator extends SubsystemBase {
   public boolean getElevatorUp() {
     return leftMotor.getReverseLimitSwitch().isPressed();
   }
-
+  public double getSetpoint() {
+    return setpoint;
+  }
+  public void increaseSetpoint(double step) {
+    setpoint += step;
+  }
+  public void setSetpoint(double target) {
+    setpoint = target;
+  }
   // Controls elevator movement using dual motors for balanced lifting
-  public void runElevatorUp(double speed) {
+  public void runElevatorUp(double speed, Arm arm) {
     speed *= -1;
+    if (speed > 0) {
+    if (!(arm.getEncoderPosition() < 60)) {
     leftMotor.set(speed);
     rightMotor.set(-speed);
+    }
+    }
+    else {
+      leftMotor.set(speed);
+    rightMotor.set(-speed);
+    }
   }
   // Returns current elevator position using left motor's encoder
   public double getElevatorPosition() {
@@ -65,9 +82,6 @@ public class Elevator extends SubsystemBase {
   }
   public double getStallCurrent() {
     return kStallSpeed;
-  }
-  public void increaseStall() {
-    kStallSpeed += 0.001;
   }
   public void stallElevator() {
     leftMotor.set(kStallSpeed);

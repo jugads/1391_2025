@@ -24,12 +24,7 @@ public class KnuckleDefault extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (knuckle.hasCoral()) {
-      knuckle.setKnuckleMotorLow();
-    }
-    else {
-      knuckle.setKnuckleMotorHigh();
-    }
+    knuckle.stopMotor();
   }
 
   // Called once the command ends or is interrupted.

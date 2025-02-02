@@ -21,10 +21,12 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.ADXL345_I2C.AllAxes;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -116,7 +118,7 @@ public class RobotContainer {
             )
         );
         elevator.setDefaultCommand(
-            new ElevatorDefault(elevator)
+            new ElevatorDefault(elevator, arm)
         );
         knuckle.setDefaultCommand(
             new KnuckleDefault(knuckle)
@@ -124,7 +126,10 @@ public class RobotContainer {
         algaeScorer.setDefaultCommand(new AlgaeDefault(algaeScorer));
         arm.setDefaultCommand(new ArmDefault(arm, arm.getEncoderPosition()));
         chute.setDefaultCommand(new InstantCommand(() -> chute.stopMotor(), chute));
-
+        leds.setDefaultCommand(
+            new InstantCommand(() ->
+            leds.setDef(true), leds)
+        );
 
         //DRIVER ------------------------------------------------------------------------------
         joystick.rightBumper().whileTrue(
@@ -154,27 +159,52 @@ public class RobotContainer {
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
         // reset the field-centric heading on left bumper press
         // joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-        joystick.leftBumper().whileTrue(new RunCommand(() -> chute.runMotor(-0.5), chute).until(() -> chute.hasCoral()).andThen(new RunCommand(() -> chute.runMotor(0.1)).until(() -> !chute.hasCoral())));
-        joystick.rightTrigger().whileTrue(new RunElevator(elevator, 0.35));
-        joystick.leftTrigger().whileTrue(new RunElevator(elevator, -0.2));
-        joystick.y().whileTrue(new ArmToAngle(arm, 150));
-        joystick.a().whileTrue(new RunCommand(() -> algaeScorer.runAlgaeScorer(0.3), algaeScorer));
-        joystick.b().whileTrue(new RunCommand(() -> algaeScorer.runAlgaeScorer(-1.)));
-        
+        joystick.rightTrigger().whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> elevator.setSetpoint(1.01)),
+                new ArmToAngle(arm, 155),
+                new RunCommand(() -> knuckle.setKnuckleMotorLow())
+            )
+        );
+        operator.start().whileTrue(new RunCommand(() -> chute.runMotor(-0.4), chute).until(() -> chute.hasCoral()));
+        joystick.y().whileTrue(new ParallelCommandGroup(new SequentialCommandGroup(
+            new InstantCommand(() -> elevator.setSetpoint(0.74)),
+            new WaitUntilCommand(() -> elevator.getElevatorPosition() > 0.7),
+            new ArmToAngle(arm, 15),
+            new WaitUntilCommand(() -> arm.getEncoderPosition() < 18),
+            new ParallelCommandGroup(
+                new RunCommand(() -> knuckle.setKnuckleMotorHigh()),
+                new RunCommand(() -> chute.runMotor(-0.45), chute)
+            ).until(() -> knuckle.hasCoral()),
+            new ParallelCommandGroup(
+                new RunCommand(() -> knuckle.setKnuckleMotorHigh()),
+                new InstantCommand(() -> elevator.setSetpoint(0.8))
+            ).until(() -> elevator.getElevatorPosition() > 0.76),
+            new ParallelCommandGroup(
+            new ArmToAngle(arm, 50),
+            new RunCommand(() -> knuckle.setKnuckleMotorHigh()))
+            ), 
+            new RunCommand(() -> leds.setDef(false), leds)));
+        joystick.povRight().whileTrue(new ArmToAngle(arm, 90));
         
         
 
 
         //OPERATOR --------------------------------------------------------------------
-        operator.y().whileTrue(new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle));
-        operator.x().whileTrue(new RunCommand(() -> knuckle.score(), knuckle));
-        operator.rightBumper().onTrue(new InstantCommand(() -> elevator.increaseStall(), elevator));
+        operator.y().whileTrue(new ParallelCommandGroup(new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle), new RunCommand(() -> chute.runMotor(-0.3), chute)));
+        joystick.x().whileTrue(new RunCommand(() -> knuckle.score(), knuckle));
+        operator.rightBumper().whileTrue(new RunCommand(() -> elevator.increaseSetpoint(-0.005)));
+        operator.leftBumper().whileTrue(new RunCommand(() -> elevator.increaseSetpoint(0.005)));
         operator.rightTrigger().whileTrue(new RunCommand(() -> arm.runMotor(0.1), arm));
         operator.leftTrigger().whileTrue(new RunCommand(() -> arm.runMotor(-0.05), arm));
-        operator.a().onTrue(AutoBuilder.pathfindToPose(targetPose, constraints, 0.0));
+        operator.a().whileTrue(new RunCommand(() -> algaeScorer.runAlgaeScorer(0.7), algaeScorer));
+        operator.b().whileTrue(new RunCommand(() -> algaeScorer.runAlgaeScorer(-1.), algaeScorer));
+        // operator.a().onTrue(AutoBuilder.pathfindToPose(targetPose, constraints, 0.0));
         drivetrain.registerTelemetry(logger::telemeterize);
     }
-
+    public void elevatorReset() {
+        elevator.setSetpoint(0.);
+    }
 
     // public Command getAutonomousCommand() {
 

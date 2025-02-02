@@ -20,6 +20,7 @@ public class Leds extends SubsystemBase {
   AlgaeScorer algaeScorer;
   Knuckle knuckle;
   Chute chute;
+  boolean def = true;
   public Leds(AddressableLED leds, AddressableLEDBuffer buffer, Arm arm, Knuckle knuckle, AlgaeScorer algaeScorer, Chute chute) {
     this.leds = leds;
     this.buffer = buffer;
@@ -66,8 +67,11 @@ public class Leds extends SubsystemBase {
     else if (knuckle.hasCoral() && algaeScorer.hasAlgae()) {
       setAll(Color.kChartreuse);
     }
+    else if (def == false ) {
+      flash(Color.kChartreuse);
+    }
     else {
-      flash(Color.kBlue);
+      flash(Color.kDarkRed);
     }
   }
     // This method will be called once per scheduler run
@@ -88,7 +92,9 @@ public class Leds extends SubsystemBase {
     }
     leds.setData(buffer);
   }
-
+  public void setDef(boolean set) {
+    def=set;
+  }
   // Sets the color of the bottom half of the LED strip
   public void setBottom(Color color) {
     int midPoint = buffer.getLength() / 2;
@@ -131,7 +137,7 @@ public class Leds extends SubsystemBase {
 
   // Makes the LEDs flash by alternating between the specified color and black
   public void flash(Color color) {
-    if ((int)(timer.get() * 2) % 2 == 0) {
+    if ((int)(timer.get() * 3) % 2 == 0) {
       setAll(color);
     } else {
       setAll(Color.kBlack);
