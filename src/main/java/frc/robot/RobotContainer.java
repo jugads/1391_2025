@@ -81,7 +81,6 @@ public class RobotContainer {
 
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController operator = new CommandXboxController(1);
-    private final CommandXboxController operator = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     // private final  SendableChooser<Command> autoChooser;
@@ -95,15 +94,11 @@ public class RobotContainer {
     Knuckle knuckle = new Knuckle();
     Chute chute = new Chute();
     Leds leds = new Leds(new AddressableLED(5), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer, chute);
-    Chute chute = new Chute();
-    Leds leds = new Leds(new AddressableLED(5), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer, chute);
     Autos autos = new Autos(drivetrain, driveRR);
 
     PathConstraints constraints = new PathConstraints(3.0, 3.0, 2*Math.PI, 4*Math.PI);
     Pose2d targetPose = new Pose2d(8,5,Rotation2d.fromDegrees(180));
 
-    PathConstraints constraints = new PathConstraints(3.0, 3.0, 2*Math.PI, 4*Math.PI);
-    Pose2d targetPose = new Pose2d(8,5,Rotation2d.fromDegrees(180));
 
     public RobotContainer() {
     // Add options to the chooser

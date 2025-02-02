@@ -20,8 +20,6 @@ public class Chute extends SubsystemBase {
   SparkMax motor;
   DigitalInput beamBreak  = new DigitalInput(kBeamBreakPort);
   double coralCount = 0;
-  DigitalInput beamBreak  = new DigitalInput(kBeamBreakPort);
-  double coralCount = 0;
   // Constructor initializes the chute's brushless motor with specified ID
   public Chute() {
     motor = new SparkMax(kMotorID, MotorType.kBrushless);

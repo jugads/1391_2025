@@ -27,16 +27,18 @@ public class Knuckle extends SubsystemBase {
   // Continuously updates SmartDashboard with coral detection status
   @Override
   public void periodic() {
-    if (state=="searching") {
-      setKnuckleMotorHigh();
+    if (motor.getOutputCurrent() >= 15) {
+      coralCount ++;
     }
-    else if (state=="has coral") {
-      setKnuckleMotorLow();
+    if (coralCount > 3 && motor.getOutputCurrent() <= 2) {
+      coralCount = 0;
     }
-    else {
-      stopMotor();
-    }
-    SmartDashboard.putString("Coral State", getState());
+    // if (hasCoral()) {
+    //   setKnuckleMotorLow();
+    // }
+    // else {
+    //   setKnuckleMotorHigh();
+    // }
     SmartDashboard.putNumber("Coral Gripper Current", motor.getOutputCurrent());
     SmartDashboard.putBoolean("Coral or Not", hasCoral());
     SmartDashboard.putNumber("Coral Count", coralCount);
@@ -48,11 +50,20 @@ public class Knuckle extends SubsystemBase {
     motor.set(-kHighSpeed);
   }
   public boolean hasCoral() {
-    return motor.getReverseLimitSwitch().isPressed();
+    if (coralCount > 5) {
+      coralState = true;
+    }
+    else {
+      coralState = false;
+    }
+    return coralState;
   }
   // Sets the knuckle motor to run at a predefined low speed
   public void setKnuckleMotorLow() {
-    motor.set(kLowSpeed);
+    motor.set(-kLowSpeed);
+    }
+    public void score() {
+      motor.set(-1.);
     }
   // Retrieves the current draw from the motor for coral detection
   public double getCurrent() {
