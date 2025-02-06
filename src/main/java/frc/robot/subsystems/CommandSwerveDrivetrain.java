@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Dictionary;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -44,6 +45,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -58,7 +60,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Notifier m_simNotifier = null;
     private Field2d field = new Field2d();
     private double m_lastSimTime;
-    NetworkTable m_limelight = NetworkTableInstance.getDefault().getTable("limelight");
+    // NetworkTable m_limelight = NetworkTableInstance.getDefault().getTable("limelight");
     NetworkTable m_limelightRear = NetworkTableInstance.getDefault().getTable("limelight-back");
     NetworkTable m_limelightFront = NetworkTableInstance.getDefault().getTable("limelight-front");
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
@@ -67,7 +69,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
     // private DigitalInput sensor = new DigitalInput(9);
     NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
-    NetworkTable table = ntInstance.getTable("Pose");
     NetworkTable poseTable = ntInstance.getTable("MyPose");
     Pose2d lastPose;
     /* Keep track if we've ever applied the operator perspective before or not */
@@ -82,7 +83,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final PIDController m_pathYController = new PIDController(10, 0, 0);
     private final PIDController m_pathThetaController = new PIDController(7, 0, 0);
     private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds();
-
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
         new SysIdRoutine.Config(
@@ -342,10 +342,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void periodic() {
         poseEstimator.update(getPigeon2().getRotation2d(), getModulePositions());
         if (!DriverStation.isAutonomous()) {
-        // if (getTVFront()) {
-        //     poseEstimator.resetPose(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()));
-        //     // lastPose = new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d());
-        // }
+        if (getTVFront()) {
+            poseEstimator.resetPose(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()));
+            // lastPose = new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d());
+        }
         // else if (getTV()) {
         //     poseEstimator.resetPose(new Pose2d(getPoseLL().getTranslation(), getPigeon2().getRotation2d()));
         // }
@@ -423,12 +423,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 .withWheelForceFeedforwardsY(sample.moduleForcesY())
         );
     }
-    public double getTX() {
-        return m_limelight.getEntry("tx").getDouble(0.0);
-      }
-      public double getTY() {
-        return m_limelight.getEntry("ty").getDouble(0.0);
-      }
+    // public double getTX() {
+    //     return m_limelight.getEntry("tx").getDouble(0.0);
+    //   }
+    //   public double getTY() {
+    //     return m_limelight.getEntry("ty").getDouble(0.0);
+    //   }
       public double getTXFront() {
         return m_limelightFront.getEntry("tx").getDouble(0.);
       }
@@ -438,32 +438,32 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       public boolean getTVFront() {
         return m_limelightFront.getEntry("tv").getDouble(0.0) == 1.0;
       }
-      public boolean getTV() {
-        return m_limelight.getEntry("tv").getDouble(0.0) == 1.0;
-      }
+    //   public boolean getTV() {
+    //     return m_limelight.getEntry("tv").getDouble(0.0) == 1.0;
+    //   }
       public boolean getTVRear() {
         return m_limelightRear.getEntry("tv").getDouble(0.0) == 1.0;
       }
-      public double getTZ() {
-        return m_limelight.getEntry("ty").getDouble(0.0);
-      }
-      public Pose2d getPoseLL() {
-        var array = m_limelight.getEntry("botpose_wpired").getDoubleArray(new double[]{});
-        double[] result = {array[0], array[1], array[5]};
-        Pose2d pose = new Pose2d(result[0], result[1], new Rotation2d(result[2]));
-        return pose;
-        // double[] poseArray = {pose.getX(), pose.getY(), ((pose.getRotation().getDegrees())/360)+(pose.getRotation().getDegrees()%360)};
-        // table.getEntry("RobotPose").setDoubleArray(poseArray);
-        // SmartDashboard.putNumberArray("Raw Pose", result);
-      }
+    //   public double getTZ() {
+    //     return m_limelight.getEntry("ty").getDouble(0.0);
+    //   }
+    //   public Pose2d getPoseLL() {
+    //     var array = m_limelight.getEntry("botpose_wpired").getDoubleArray(new double[]{});
+    //     double[] result = {array[0], array[1], array[5]};
+    //     Pose2d pose = new Pose2d(result[0], result[1], new Rotation2d(result[2]));
+    //     return pose;
+    //     // double[] poseArray = {pose.getX(), pose.getY(), ((pose.getRotation().getDegrees())/360)+(pose.getRotation().getDegrees()%360)};
+    //     // table.getEntry("RobotPose").setDoubleArray(poseArray);
+    //     // SmartDashboard.putNumberArray("Raw Pose", result);
+    //   }
       public Pose2d getRearLLPose() {
         var array = m_limelightRear.getEntry("botpose_wpiblue").getDoubleArray(new double[]{});
-        double[] result = {array[0], array[1], array[5]};
-        Pose2d pose = new Pose2d(result[0], result[1], new Rotation2d(result[2]));
+        // double[] result = {array[0], array[1], array[5]};
+        Pose2d pose = new Pose2d(0, 0, new Rotation2d(0));
         return pose;
       }
       public Pose2d getFrontLLPose() {
-        var array = m_limelightFront.getEntry("botpose_wpiblue").getDoubleArray(new double[]{});
+        var array = m_limelightFront.getEntry("botpose").getDoubleArray(new double[]{});
         double[] result = {array[0], array[1], array[5]};
         Pose2d pose = new Pose2d(result[0], result[1], new Rotation2d(result[2]));
         return pose;
@@ -506,6 +506,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       }
     //   public Command FollowPathCommand(PathPlannerPath path) {
         // configureAutoBuilder();
+
+
+
+
+    public double getTIDFront() {
+        return m_limelightFront.getEntry("tid").getDouble(0.);
+    }
 
         //PathConstraints constraints = new PathConstraints(
         //3.0, 4.0,

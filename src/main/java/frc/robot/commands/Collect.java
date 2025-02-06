@@ -43,8 +43,8 @@ public class Collect extends Command {
   @Override
   public void execute() {
     updatedDrive = drive
-    .withVelocityX(((-kMaxSpeed * driveController.calculate(m_drivetrain.getTY()))))
-    .withRotationalRate(kMaxAngularRate * turnController.calculate(m_drivetrain.getTX()));
+    .withVelocityX(((-kMaxSpeed * driveController.calculate(m_drivetrain.getTYFront()))))
+    .withRotationalRate(kMaxAngularRate * turnController.calculate(m_drivetrain.getTXFront()));
     m_drivetrain.setControl(updatedDrive);
     System.out.println("Command");
     // SmartDashboard.putNumber("Applied Velocity", velocity);

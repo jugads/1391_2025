@@ -33,8 +33,8 @@ public class ArmDefault extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    SmartDashboard.putNumber("Arm Controller", -controller.calculate(m_arm.getEncoderPosition()));
-  m_arm.runMotor((Math.sin(Math.toRadians(m_arm.getEncoderPosition()-12)))* (-controller.calculate(m_arm.getEncoderPosition(), m_arm.getEncoderPosition())));
+  SmartDashboard.putNumber("Arm Controller", -controller.calculate(m_arm.getEncoderPosition()));
+  m_arm.runMotor((Math.sin(Math.toRadians(m_arm.getEncoderPosition())))* (-controller.calculate(m_arm.getEncoderPosition(), m_arm.getEncoderPosition())));
   }
 
   // Called once the command ends or is interrupted.

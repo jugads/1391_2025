@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import static frc.robot.Constants.ArmConstants.*;
@@ -26,13 +27,14 @@ public class ArmToAngle extends Command {
   @Override
   public void initialize() {
     controller.setSetpoint(desiredArmAngle);
-    controller.setTolerance(3.);
+    controller.setTolerance(1.);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     m_arm.runMotor(controller.calculate(m_arm.getEncoderPosition()));
+    SmartDashboard.putBoolean("Arm At angle", controller.atSetpoint());
   }
 
   // Called once the command ends or is interrupted.
@@ -44,6 +46,6 @@ public class ArmToAngle extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return controller.atSetpoint();
+    return false;
   }
 }

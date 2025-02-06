@@ -67,11 +67,9 @@ public class Autos extends Command {
     path.resetOdometry()
     .andThen(
       new SequentialCommandGroup(
-        path.cmd(), // run first path 
-         new DriveToAprilTag(drivetrain, driveRR, -20, true, -9), // align with F branch
+        path.cmd(), // run first path  // align with F branch
         // add commands for transfering and scoring
-        path1.cmd(), // run second path 
-        new DriveToAprilTag(drivetrain, driveRR, -20, true, -9)
+        path1.cmd() // run second path
         // add commands for transfering and scoring
       )
     )

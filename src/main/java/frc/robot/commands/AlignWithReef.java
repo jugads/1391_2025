@@ -4,40 +4,48 @@
 
 package frc.robot.commands;
 
+import static frc.robot.Constants.DrivetrainConstants.kMaxAngularRate;
+
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class RotateToAprilTag extends Command {
-  /** Creates a new RotateToAprilTag. */
+public class AlignWithReef extends Command {
+  /** Creates a new AlignWithReef. */
+  
+  PIDController thetaController = new PIDController(0.02, 0, 0.0008);
   CommandSwerveDrivetrain drivetrain;
   SwerveRequest.RobotCentric drive;
-  double tolerance;
-  PIDController controller = new PIDController(0.11875, 0, 0.0125);
-  public RotateToAprilTag(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric drive, double tolerance) {
+  public AlignWithReef(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric drive) {
     this.drivetrain = drivetrain;
     this.drive = drive;
-    this.tolerance = tolerance;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(drivetrain);
+    addRequirements(this.drivetrain);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-      controller.setSetpoint(0.);
-      controller.setTolerance(tolerance);
+    thetaController.setSetpoint(180);
+    thetaController.setTolerance(0.1);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drivetrain.setControl(
-    drive
-    .withRotationalRate(-controller.calculate(drivetrain.getTXFront()))
-    );
+      drivetrain.setControl(
+        drive
+        .withRotationalRate(kMaxAngularRate * thetaController.calculate(getYaw()))
+        .withVelocityX(0)
+        .withVelocityY(0)
+      );
+      SmartDashboard.putNumber("Calculation", thetaController.calculate(getYaw()));
   }
 
   // Called once the command ends or is interrupted.
@@ -47,6 +55,10 @@ public class RotateToAprilTag extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(drivetrain.getTXFront()) <= 3;
+    return thetaController.atSetpoint();
   }
+
+  public double getYaw() {
+    return drivetrain.getPigeon2().getRotation2d().getDegrees();
+}
 }

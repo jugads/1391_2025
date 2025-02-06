@@ -59,7 +59,7 @@ public class Elevator extends SubsystemBase {
     return leftMotor.getReverseLimitSwitch().isPressed();
   }
   public double getSetpoint() {
-    return setpoint;
+    return MathUtil.clamp(setpoint, 0., 1.);
   }
   public void increaseSetpoint(double step) {
     setpoint += step;
