@@ -98,7 +98,7 @@ public class RobotContainer {
     Knuckle knuckle = new Knuckle();
     Chute chute = new Chute();
     Leds leds = new Leds(new AddressableLED(5), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer, chute);
-    Autos autos = new Autos(drivetrain, driveRR);
+    Autos autos = new Autos(drivetrain, driveRR, arm, elevator, knuckle, chute);
 
     PathConstraints constraints = new PathConstraints(3.0, 3.0, 2*Math.PI, 4*Math.PI);
     Pose2d targetPose = new Pose2d(8,5,Rotation2d.fromDegrees(180));
