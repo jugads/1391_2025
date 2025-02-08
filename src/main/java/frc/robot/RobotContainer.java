@@ -54,7 +54,7 @@ import frc.robot.commands.RotateToAprilTag;
 import frc.robot.commands.RunElevator;
 import frc.robot.commands.Transfer;
 import frc.robot.commands.Transfer;
-
+import static frc.robot.Constants.OperatorConstants.*;
 import com.revrobotics.spark.SparkMax;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -219,10 +219,6 @@ public class RobotContainer {
                 new ArmToAngle(arm, 180)
             )
         );
-        joystick.a().whileTrue(new SequentialCommandGroup(
-            new AlignWithReef(drivetrain, driveRR),
-            new DriveToReef(drivetrain, driveRR)
-            ));
 
 
         //OPERATOR --------------------------------------------------------------------
@@ -235,35 +231,40 @@ public class RobotContainer {
         // operator.a().whileTrue(new RunCommand(() -> algaeScorer.runAlgaeScorer(0.7), algaeScorer));
         // operator.b().whileTrue(new RunCommand(() -> algaeScorer.runAlgaeScorer(-1.), algaeScorer));
         // operator.a().onTrue(AutoBuilder.pathfindToPose(targetPose, constraints, 0.0));
-        new JoystickButton(operator, 4).whileTrue(
+        new JoystickButton(operator, kL1).whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> elevator.setSetpoint(0.63)),
-                new ArmToAngle(arm, 45),
+                new ArmToAngle(arm, 65),
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
         );
-        new JoystickButton(operator, 3).whileTrue(
+        new JoystickButton(operator, kL2).whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> elevator.setSetpoint(0.3)),
                 new ArmToAngle(arm, 160),
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
         );
-        new JoystickButton(operator, 2).whileTrue(
+        new JoystickButton(operator, kL3).whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> elevator.setSetpoint(0.56)),
                 new ArmToAngle(arm, 160),
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
         );
-        new JoystickButton(operator, 1).whileTrue(
+        new JoystickButton(operator, kL4).whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> elevator.setSetpoint(0.98)),
                 new ArmToAngle(arm, 160),
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
         );
-
+        new JoystickButton(operator, kAutoAlignLeft).whileTrue(new SequentialCommandGroup(
+            new DriveToReef(drivetrain, driveRR, true)
+        ));
+        new JoystickButton(operator, kAutoAlignRight).whileTrue(new SequentialCommandGroup(
+            new DriveToReef(drivetrain, driveRR, true)
+        ));
         //MANUAL -------------------------------------------------------------
         manual.povUp().whileTrue(
         new RunCommand(() -> elevator.increaseSetpoint(0.005))
@@ -281,7 +282,7 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
     }
     public void elevatorReset() {
-        elevator.setSetpoint(0.);
+        elevator.setSetpoint(elevator.getSetpoint());
     }
 
     // public Command getAutonomousCommand() {

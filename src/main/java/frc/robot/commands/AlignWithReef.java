@@ -19,12 +19,14 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 public class AlignWithReef extends Command {
   /** Creates a new AlignWithReef. */
   
-  PIDController thetaController = new PIDController(0.02, 0, 0.0008);
+  PIDController thetaController = new PIDController(0.199, 0, 0.001);
   CommandSwerveDrivetrain drivetrain;
   SwerveRequest.RobotCentric drive;
-  public AlignWithReef(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric drive) {
+  double setpoint;
+  public AlignWithReef(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric drive, double ID) {
     this.drivetrain = drivetrain;
     this.drive = drive;
+    this.setpoint = (Math.PI+(ID-7)*(Math.PI/3));
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.drivetrain);
   }
@@ -32,8 +34,8 @@ public class AlignWithReef extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    thetaController.setSetpoint(180);
-    thetaController.setTolerance(0.1);
+    thetaController.setSetpoint(setpoint);
+    thetaController.setTolerance(Math.PI/180);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,7 +47,8 @@ public class AlignWithReef extends Command {
         .withVelocityX(0)
         .withVelocityY(0)
       );
-      SmartDashboard.putNumber("Calculation", thetaController.calculate(getYaw()));
+      SmartDashboard.putNumber("Calculation", kMaxAngularRate*thetaController.calculate(getYaw()));
+      SmartDashboard.putNumber("Alignment setpoint", thetaController.getSetpoint());
   }
 
   // Called once the command ends or is interrupted.
@@ -59,6 +62,6 @@ public class AlignWithReef extends Command {
   }
 
   public double getYaw() {
-    return drivetrain.getPigeon2().getRotation2d().getDegrees();
+    return drivetrain.getPigeon2().getRotation2d().getRadians();
 }
 }

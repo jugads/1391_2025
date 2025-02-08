@@ -5,6 +5,14 @@ public class Constants {
         public static final double kMaxSpeed = 5.41;
         public static final double kMaxAngularRate = kMaxSpeed * 39.37 / 20.75 * Math.PI;
     }
+    public class OperatorConstants {
+        public static final int kL4 = 1;
+        public static final int kL3 = 2;
+        public static final int kL2 = 3;
+        public static final int kL1 = 4;
+        public static final int kAutoAlignLeft = 0;
+        public static final int kAutoAlignRight = 0;
+    }
     public class KnuckleConstants {
         public static final int kMotorID = 5;
         // public static final double kCurrentThreshold = 75;

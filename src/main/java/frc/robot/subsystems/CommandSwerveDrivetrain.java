@@ -343,7 +343,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         poseEstimator.update(getPigeon2().getRotation2d(), getModulePositions());
         if (!DriverStation.isAutonomous()) {
         if (getTVFront()) {
-            poseEstimator.resetPose(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()));
+            poseEstimator.addVisionMeasurement(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-m_limelightFront.getEntry("ta").getDouble(0.));
             // lastPose = new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d());
         }
         // else if (getTV()) {
