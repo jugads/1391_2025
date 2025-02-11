@@ -61,6 +61,7 @@ public class Autos extends Command {
      this.knuckle = knuckle;
      this.chute = chute;
      this.leds = leds;
+     this. driveRR = driveRR;
 
     autoFactory = this.drivetrain.createAutoFactory();
 
@@ -77,10 +78,12 @@ public class Autos extends Command {
     ),
     autoFactory.trajectoryCmd("New Path"));
  }
+
+
  public AutoRoutine pathConnectingTest() {
   final AutoRoutine autoRoutine = autoFactory.newRoutine("Path Connecting Test");
   final AutoTrajectory path = autoRoutine.trajectory("BStart-FBranch");
-  final AutoTrajectory path1 = autoRoutine.trajectory("BFBranch-Source-DBranch");
+  final AutoTrajectory path1 = autoRoutine.trajectory("BFBranch-Source");
   final AutoTrajectory path2 = autoRoutine.trajectory("BDBranch-Source-CBranch");
   
   autoRoutine.active().onTrue(
@@ -88,8 +91,8 @@ public class Autos extends Command {
     .andThen(
       new SequentialCommandGroup(
         path.cmd(),
-        new AlignWithReef(drivetrain, driveRR), // Make correct ID and make if then statement for bluevs red april tag
-        new DriveToReef(drivetrain, driveRR, false), 
+      
+        new DriveToReef(drivetrain, driveRR, true), 
         new ParallelCommandGroup( //score L4
           new InstantCommand(() -> elevator.setSetpoint(0.98)),
           new ArmToAngle(arm, 160),
@@ -121,7 +124,7 @@ public class Autos extends Command {
             new InstantCommand(() -> elevator.setSetpoint(0.08))
             ),
             new RunCommand(() -> leds.setDef(false), leds)),
-            new AlignWithReef(drivetrain, driveRR), // Make correct ID and make if then statement for bluevs red april tag
+            
             new DriveToReef(drivetrain, driveRR, false), 
             new ParallelCommandGroup( //score L4
             new InstantCommand(() -> elevator.setSetpoint(0.98)),
@@ -153,7 +156,7 @@ public class Autos extends Command {
                 new InstantCommand(() -> elevator.setSetpoint(0.08))
                 ),
                 new RunCommand(() -> leds.setDef(false), leds)),
-                new AlignWithReef(drivetrain, driveRR), // Make correct ID and make if then statement for bluevs red april tag
+                
                 new DriveToReef(drivetrain, driveRR, true), 
                 new ParallelCommandGroup( //score L4
                 new InstantCommand(() -> elevator.setSetpoint(0.98)),
@@ -166,6 +169,35 @@ public class Autos extends Command {
       )
     )
     
+  );
+  return autoRoutine;
+ }
+
+ public AutoRoutine fbranchanddbranch() {
+final AutoRoutine autoRoutine = autoFactory.newRoutine("fbranchanddbranch");
+final AutoTrajectory path = autoRoutine.trajectory("Start-FBranch");
+final AutoTrajectory path1 = autoRoutine.trajectory("FBranch-Source");
+final AutoTrajectory path2 = autoRoutine.trajectory("Source-DBranch");
+
+ autoRoutine.active().onTrue(
+    path.resetOdometry()
+    .andThen(
+      new SequentialCommandGroup(
+        path.cmd(),
+        // new DriveToReef(drivetrain, driveRR, true), 
+        new ParallelCommandGroup( //score L3
+          new InstantCommand(() -> elevator.setSetpoint(0.53)),
+          new ArmToAngle(arm, 160),
+          new RunCommand(() -> knuckle.setKnuckleMotorLow())
+          ).until(() -> elevator.getElevatorPosition() > 0.51 && arm.getEncoderPosition() > 158),
+          new RunCommand(() -> knuckle.score()),
+         new ParallelCommandGroup(
+                new InstantCommand(() -> elevator.setSetpoint(0.2)),
+                new ArmToAngle(arm, 180)
+            )
+
+      )
+    )
   );
   return autoRoutine;
  }

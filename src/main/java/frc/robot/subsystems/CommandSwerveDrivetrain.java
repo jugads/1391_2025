@@ -352,10 +352,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             }
             // lastPose = new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d());
         }
-        if (getTVRear()) {
+        // if (getTVRear()) {
             
-            poseEstimator.addVisionMeasurement(new Pose2d(getRearLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-(m_limelightRear.getEntry("tl").getDouble(0.))/1000);
-        }
+        //     poseEstimator.addVisionMeasurement(new Pose2d(getRearLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-(m_limelightRear.getEntry("tl").getDouble(0.))/1000);
+        // }
         // else if (getTV()) {
         //     poseEstimator.resetPose(new Pose2d(getPoseLL().getTranslation(), getPigeon2().getRotation2d()));
         // }

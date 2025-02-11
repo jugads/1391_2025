@@ -93,7 +93,7 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final RobotCentric driveRR = new SwerveRequest.RobotCentric()
+    private final SwerveRequest.RobotCentric driveRR = new SwerveRequest.RobotCentric()
     .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); 
 
@@ -120,8 +120,8 @@ public class RobotContainer {
     public RobotContainer() {
     // Add options to the chooser
     // if (DriverStation.getAlliance().get() == Alliance.Blue) {drivetrain.getPigeon2().setYaw(0);}
-    // else if (DriverStation.getAlliance().get() == Alliance.Red) {drivetrain.getPigeon2().setYaw(180);}
-    RobotModeTriggers.autonomous().whileTrue(autos.pathConnectingTest().cmd());
+   // else if (DriverStation.getAlliance().get() == Alliance.Red) {drivetrain.getPigeon2().setYaw(180);}
+    RobotModeTriggers.autonomous().whileTrue(autos.fbranchanddbranch().cmd());
         // SmartDashboard.putNumber("Current Draw Climber", motor.getOutputCurrent());
         publisher = NetworkTableInstance.getDefault()
         .getStructTopic("MyPose", Pose2d.struct).publish();
@@ -317,13 +317,12 @@ public class RobotContainer {
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
         );
-        new JoystickButton(operator, kAutoAlignLeft).whileTrue(new SequentialCommandGroup(
-            new AlignWithReef(drivetrain, driveRR),
+        new JoystickButton(operator, kAutoAlignLeft).whileTrue(
             new DriveToReef(drivetrain, driveRR, true)
-        ));
-        new JoystickButton(operator, kAutoAlignRight).whileTrue(new SequentialCommandGroup(
+        );
+        new JoystickButton(operator, kAutoAlignRight).whileTrue(
             new DriveToReef(drivetrain, driveRR, false)
-        ));
+        );
         new JoystickButton(operator, k0degrees).and(joystick.a()).whileTrue(
             AutoBuilder.pathfindToPose(kRED6_7, constraints)
         );
@@ -344,7 +343,7 @@ public class RobotContainer {
         );
         // SmartDashboard.putNumber("null", operator.getY());
         //MANUAL -------------------------------------------------------------
-        manual.povUp().whileTrue(
+      /*  manual.povUp().whileTrue(
         new RunCommand(() -> elevator.increaseSetpoint(0.005))
         );
         manual.povDown().whileTrue(
@@ -357,8 +356,8 @@ public class RobotContainer {
         manual.rightTrigger().whileTrue(
         new RunCommand(() -> arm.runMotor(0.1))
         );
-        drivetrain.registerTelemetry(logger::telemeterize);
-    }
+        drivetrain.registerTelemetry(logger::telemeterize); */
+    } 
     public void elevatorReset() {
         elevator.setSetpoint(0);
     }
