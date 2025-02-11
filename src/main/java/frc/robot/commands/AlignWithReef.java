@@ -19,14 +19,18 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 public class AlignWithReef extends Command {
   /** Creates a new AlignWithReef. */
   
-  PIDController thetaController = new PIDController(0.199, 0, 0.001);
+  PIDController thetaController = new PIDController(0.199, 0, 0.0015);
   CommandSwerveDrivetrain drivetrain;
   SwerveRequest.RobotCentric drive;
   double setpoint;
-  public AlignWithReef(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric drive, double ID) {
+  public AlignWithReef(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric drive) {
     this.drivetrain = drivetrain;
     this.drive = drive;
+    var ID = drivetrain.getTIDFront();
     this.setpoint = (Math.PI+(ID-7)*(Math.PI/3));
+    if (this.setpoint > Math.PI) {
+      this.setpoint -= 2*Math.PI;
+    }
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.drivetrain);
   }
@@ -36,19 +40,22 @@ public class AlignWithReef extends Command {
   public void initialize() {
     thetaController.setSetpoint(setpoint);
     thetaController.setTolerance(Math.PI/180);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if (drivetrain.getTVFront()) {
       drivetrain.setControl(
         drive
         .withRotationalRate(kMaxAngularRate * thetaController.calculate(getYaw()))
         .withVelocityX(0)
         .withVelocityY(0)
       );
-      SmartDashboard.putNumber("Calculation", kMaxAngularRate*thetaController.calculate(getYaw()));
+    }
       SmartDashboard.putNumber("Alignment setpoint", thetaController.getSetpoint());
+      SmartDashboard.putBoolean("Aligned", isFinished());
   }
 
   // Called once the command ends or is interrupted.
@@ -58,7 +65,7 @@ public class AlignWithReef extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return thetaController.atSetpoint();
+    return Math.abs(thetaController.getSetpoint()-getYaw()) < Math.PI/45;
   }
 
   public double getYaw() {

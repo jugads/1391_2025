@@ -88,7 +88,7 @@ public class Autos extends Command {
     .andThen(
       new SequentialCommandGroup(
         path.cmd(),
-        new AlignWithReef(drivetrain, driveRR, 9), // Make correct ID and make if then statement for bluevs red april tag
+        new AlignWithReef(drivetrain, driveRR), // Make correct ID and make if then statement for bluevs red april tag
         new DriveToReef(drivetrain, driveRR, false), 
         new ParallelCommandGroup( //score L4
           new InstantCommand(() -> elevator.setSetpoint(0.98)),
@@ -121,7 +121,7 @@ public class Autos extends Command {
             new InstantCommand(() -> elevator.setSetpoint(0.08))
             ),
             new RunCommand(() -> leds.setDef(false), leds)),
-            new AlignWithReef(drivetrain, driveRR, 8), // Make correct ID and make if then statement for bluevs red april tag
+            new AlignWithReef(drivetrain, driveRR), // Make correct ID and make if then statement for bluevs red april tag
             new DriveToReef(drivetrain, driveRR, false), 
             new ParallelCommandGroup( //score L4
             new InstantCommand(() -> elevator.setSetpoint(0.98)),
@@ -153,7 +153,7 @@ public class Autos extends Command {
                 new InstantCommand(() -> elevator.setSetpoint(0.08))
                 ),
                 new RunCommand(() -> leds.setDef(false), leds)),
-                new AlignWithReef(drivetrain, driveRR, 8), // Make correct ID and make if then statement for bluevs red april tag
+                new AlignWithReef(drivetrain, driveRR), // Make correct ID and make if then statement for bluevs red april tag
                 new DriveToReef(drivetrain, driveRR, true), 
                 new ParallelCommandGroup( //score L4
                 new InstantCommand(() -> elevator.setSetpoint(0.98)),

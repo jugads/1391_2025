@@ -171,7 +171,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // Handle exception as needed
         e.printStackTrace();
         }
-        // configureAutoBuilder();
+        configureAutoBuilder();
     }
         
         
@@ -199,7 +199,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        // configureAutoBuilder();
+        configureAutoBuilder();
     }
 
 
@@ -233,7 +233,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        // configureAutoBuilder();
+        configureAutoBuilder();
     }
 
     private void configureAutoBuilder() {
@@ -248,7 +248,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
                                 ), 
                                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                                new PIDConstants(10.0, 0.0, 0.0), // Translation PID constants
+                                new PIDConstants(9.0, 0.0, 0.0), // Translation PID constants
                                 new PIDConstants(7.0, 0.0, 0.0)
             ), 
                                 config, 
@@ -268,7 +268,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                                     
                 }
                 catch (Exception ex) {
-                    DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
+                    DriverStation.reportError("HAWK TUAH", ex.getStackTrace());
                 }
         }
 
@@ -343,13 +343,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         poseEstimator.update(getPigeon2().getRotation2d(), getModulePositions());
         if (!DriverStation.isAutonomous()) {
         if (getTVFront()) {
-            poseEstimator.addVisionMeasurement(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-m_limelightFront.getEntry("ta").getDouble(0.));
+            if (Math.abs(getPose().getX() - getFrontLLPose().getX()) > 0.2) {
+            poseEstimator.resetPose(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()));
+            }
+            else {
+            poseEstimator.addVisionMeasurement(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-(m_limelightFront.getEntry("tl").getDouble(0.))/1000);
+            // SmartDashboard.putBoolean("Updating?", true);
+            }
             // lastPose = new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d());
+        }
+        if (getTVRear()) {
+            
+            poseEstimator.addVisionMeasurement(new Pose2d(getRearLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-(m_limelightRear.getEntry("tl").getDouble(0.))/1000);
         }
         // else if (getTV()) {
         //     poseEstimator.resetPose(new Pose2d(getPoseLL().getTranslation(), getPigeon2().getRotation2d()));
         // }
     }
+        // SmartDashboard.putBoolean("endedjneldkenk", getTVFront());
         // if (getFrontLLPose().getRotation().getDegrees() - getPose().getRotation().getDegrees() > 90) {
         //     getPigeon2().setYaw(getFrontLLPose().getRotation().getDegrees());
         // }
@@ -436,7 +447,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_limelightFront.getEntry("ty").getDouble(0.);
       }
       public boolean getTVFront() {
-        return m_limelightFront.getEntry("tv").getDouble(0.0) == 1.0;
+        return m_limelightFront.getEntry("tv").getDouble(0.) == 1.;
       }
     //   public boolean getTV() {
     //     return m_limelight.getEntry("tv").getDouble(0.0) == 1.0;
@@ -463,7 +474,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return pose;
       }
       public Pose2d getFrontLLPose() {
-        var array = m_limelightFront.getEntry("botpose").getDoubleArray(new double[]{});
+        var array = m_limelightFront.getEntry("botpose_wpiblue").getDoubleArray(new double[]{});
         double[] result = {array[0], array[1], array[5]};
         Pose2d pose = new Pose2d(result[0], result[1], new Rotation2d(result[2]));
         return pose;
@@ -495,15 +506,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       public void resetGyro(double angle) {
         getPigeon2().setYaw(angle);
       }
-      public Pose2d getPoseIntegral(Pose2d previousPose) {
-        var x = previousPose.getX();
-        var y = previousPose.getY();
-        var accelX = getPigeon2().getAccelerationX().getValueAsDouble();
-        var accelY = getPigeon2().getAccelerationY().getValueAsDouble();
-        var newX = (accelX * Math.pow(Utils.getCurrentTimeSeconds(), 2))/2;
-        var newY = (accelY * Math.pow(Utils.getCurrentTimeSeconds(), 2))/2;
-        return new Pose2d(newX, newY, getPigeon2().getRotation2d());
-      }
+    //   public Pose2d getPoseIntegral(Pose2d previousPose) {
+    //     var x = previousPose.getX();
+    //     var y = previousPose.getY();
+    //     var accelX = getPigeon2().getAccelerationX().getValueAsDouble();
+    //     var accelY = getPigeon2().getAccelerationY().getValueAsDouble();
+    //     var newX = (accelX * Math.pow(Utils.getCurrentTimeSeconds(), 2))/2;
+    //     var newY = (accelY * Math.pow(Utils.getCurrentTimeSeconds(), 2))/2;
+    //     return new Pose2d(newX, newY, getPigeon2().getRotation2d());
+    //   }
     //   public Command FollowPathCommand(PathPlannerPath path) {
         // configureAutoBuilder();
 
@@ -512,6 +523,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public double getTIDFront() {
         return m_limelightFront.getEntry("tid").getDouble(0.);
+    }
+    public Command FollowPathCommand(PathPlannerPath path) {
+        //PathConstraints constraints = new PathConstraints(
+        //3.0, 4.0,
+        //Units.degreesToRadians(540), Units.degreesToRadians(720));
+        //Command pathfindnCommand = AutoBuilder.pathfindThenFollowPath(path, null);
+
+        //Pose2d targetPose = new Pose2d(10, 5, Rotation2d.fromDegrees(180));
+        // Command pathfindingCommand = AutoBuilder.pathfindToPose(
+        // targetPose,
+        // constraints,
+        // 0.0, // Goal end velocity in meters/sec
+        // 0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
+        // );
+        return AutoBuilder.followPath(path); 
     }
 
         //PathConstraints constraints = new PathConstraints(

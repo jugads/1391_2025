@@ -16,8 +16,12 @@ public class ArmToAngle extends Command {
     Arm m_arm;
     double desiredArmAngle;
     public ArmToAngle(Arm arm, double armAngle) {
-      desiredArmAngle = armAngle;
       m_arm = arm;
+  
+        // desiredArmAngle = m_arm.getEncoderPosition();      
+      
+      desiredArmAngle = armAngle;
+
       controller = new PIDController(kPDynamic, kIDynamic, kDDynamic);
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_arm);
@@ -28,12 +32,16 @@ public class ArmToAngle extends Command {
   public void initialize() {
     controller.setSetpoint(desiredArmAngle);
     controller.setTolerance(1.);
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_arm.setSetpoint(desiredArmAngle);
+    if (m_arm.getEncoderPosition() != 360.) {
     m_arm.runMotor(controller.calculate(m_arm.getEncoderPosition()));
+    }
     SmartDashboard.putBoolean("Arm At angle", controller.atSetpoint());
   }
 

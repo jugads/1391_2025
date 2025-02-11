@@ -18,20 +18,21 @@ public class Arm extends SubsystemBase {
   // Hardware components for controlling the robot's arm mechanism
   SparkMax motor;
   DutyCycleEncoder encoder;
-
+  double lastPosition;
   // Constructor initializes motor and encoder with specified ports from Constants
   public Arm() {
     motor = new SparkMax(kMotorID, MotorType.kBrushless); 
     encoder = new DutyCycleEncoder(kEncoderPort);
+    lastPosition = getEncoderPosition();
   }
 
   // Periodic method runs repeatedly, updates dashboard with arm status
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Arm Angle", getEncoderPosition());
-    SmartDashboard.putBoolean("Arm at Transfer Height", atTransferAngle());
     SmartDashboard.putNumber("Arm Speed Motor", motor.get());
-    SmartDashboard.putNumber("Arm current draw", motor.getOutputCurrent());
+    SmartDashboard.putNumber("Setpoint arm", lastPosition);
+    // setSetpoint(getEncoderPosition());
     // This method will be called once per scheduler run
   }
 
@@ -54,4 +55,9 @@ public class Arm extends SubsystemBase {
   public boolean atTransferAngle() {
     return Math.abs(getEncoderPosition() - kTransferAngle) <= 3;
   }
+
+  public void setSetpoint(double encoderPosition) {
+    lastPosition = encoderPosition;
+  }
+  public double getSetpoint() {return lastPosition;}
 }

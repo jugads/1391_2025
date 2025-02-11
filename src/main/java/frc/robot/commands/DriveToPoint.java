@@ -4,17 +4,23 @@
 
 package frc.robot.commands;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Knuckle;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class KnuckleDefault extends Command {
-  /** Creates a new KnuckleDefault. */
-  Knuckle knuckle;
-  public KnuckleDefault(Knuckle knuckle) {
-    this.knuckle = knuckle;
+public class DriveToPoint extends Command {
+  /** Creates a new DriveToPoint. */
+  Pose2d target;
+  PathConstraints constraints;
+  public DriveToPoint(Pose2d targetPose, PathConstraints constraints) {
+    target = targetPose;
+    this.constraints = constraints;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(knuckle);
   }
 
   // Called when the command is initially scheduled.
@@ -24,12 +30,8 @@ public class KnuckleDefault extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (knuckle.hasCoral()) {
-      knuckle.setKnuckleMotorLow();
-    }
-    else {
-      knuckle.stopMotor();
-    }
+    AutoBuilder.pathfindToPose(target, constraints);
+
   }
 
   // Called once the command ends or is interrupted.

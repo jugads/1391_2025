@@ -21,6 +21,7 @@ public class Leds extends SubsystemBase {
   Knuckle knuckle;
   Chute chute;
   boolean def = true;
+  boolean transferring = false;
   public Leds(AddressableLED leds, AddressableLEDBuffer buffer, Arm arm, Knuckle knuckle, AlgaeScorer algaeScorer, Chute chute) {
     this.leds = leds;
     this.buffer = buffer;
@@ -51,8 +52,26 @@ public class Leds extends SubsystemBase {
     // Push updated LED data to the strip
     leds.setData(buffer);
   }
+  
   else {
-    if (arm.atTransferAngle()) {
+    
+    if (def == false) {
+     double time = timer.get();
+    int length = buffer.getLength();
+
+    for (int i = 0; i < length; i++) {
+        // Keep hues around chartreuse (~90°) and slightly oscillate over time
+        int baseHue = 90; // Chartreuse (yellow-green)
+        int hueVariation = 10; // Adjust for slight color variation (smaller values = steadier color)
+        int hue = baseHue + (int) (Math.sin(time * 2) * hueVariation); // Smooth oscillation
+
+        int saturation = 255; // Full saturation
+        int value = 50; // Moderate brightness
+        buffer.setLED(i, Color.fromHSV(hue, saturation, value));
+      }
+    } 
+     
+    else if (arm.atTransferAngle()) {
       setAll(Color.kFirebrick);
     }
     else if (knuckle.hasCoral()) {
@@ -67,9 +86,9 @@ public class Leds extends SubsystemBase {
     else if (knuckle.hasCoral() && algaeScorer.hasAlgae()) {
       setAll(Color.kChartreuse);
     }
-    else if (def == false ) {
+   /* else if (def == false ) {
       flash(Color.kChartreuse);
-    }
+    } */
     else {
       flash(Color.kDarkRed);
     }
@@ -143,4 +162,16 @@ public class Leds extends SubsystemBase {
       setAll(Color.kBlack);
     }
   }
+
+  public void flashBetween(Color color, Color color2) {
+    if ((int)(timer.get() * 3) % 2 == 0) {
+      setAll(color);
+    } else {
+      setAll(color2);
+    }
+  }
+   
+  
+ 
+ 
 }

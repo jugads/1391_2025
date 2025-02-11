@@ -11,6 +11,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.RobotCentric;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 
@@ -21,9 +22,11 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.ADXL345_I2C.AllAxes;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -45,8 +48,10 @@ import frc.robot.commands.AlgaeDefault;
 import frc.robot.commands.ArmDefault;
 import frc.robot.commands.ArmToAngle;
 import frc.robot.commands.Autos;
+import frc.robot.commands.DriveToPoint;
 import frc.robot.commands.DriveToReef;
 import frc.robot.commands.ElevatorDefault;
+import frc.robot.commands.FollowPath;
 import frc.robot.commands.ElevatorDefault;
 import frc.robot.commands.KnuckleDefault;
 import frc.robot.commands.MoveArm;
@@ -55,6 +60,15 @@ import frc.robot.commands.RunElevator;
 import frc.robot.commands.Transfer;
 import frc.robot.commands.Transfer;
 import static frc.robot.Constants.OperatorConstants.*;
+import static frc.robot.Constants.ReefPoses.kRED0_1;
+import static frc.robot.Constants.ReefPoses.kRED10_11;
+import static frc.robot.Constants.ReefPoses.kRED2_3;
+import static frc.robot.Constants.ReefPoses.kRED4_5;
+import static frc.robot.Constants.ReefPoses.kRED6_7;
+import static frc.robot.Constants.ReefPoses.kRED8_9;
+import static frc.robot.Constants.ReefPoses.kREDSOURCELEFT;
+import static frc.robot.Constants.ReefPoses.kREDSOURCERIGHT;
+
 import com.revrobotics.spark.SparkMax;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -69,7 +83,7 @@ import frc.robot.subsystems.Leds;
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); 
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
-
+    Pose2d currentSelfDrivingSetpoint = new Pose2d(0,0,new Rotation2d());
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -98,15 +112,15 @@ public class RobotContainer {
     Knuckle knuckle = new Knuckle();
     Chute chute = new Chute();
     Leds leds = new Leds(new AddressableLED(5), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer, chute);
-    Autos autos = new Autos(drivetrain, driveRR, arm, elevator, knuckle, chute);
+    Autos autos = new Autos(drivetrain, driveRR, arm, elevator, knuckle, chute, leds);
 
     PathConstraints constraints = new PathConstraints(3.0, 3.0, 2*Math.PI, 4*Math.PI);
-    Pose2d targetPose = new Pose2d(8,5,Rotation2d.fromDegrees(180));
 
 
     public RobotContainer() {
     // Add options to the chooser
-    drivetrain.getPigeon2().setYaw(180);
+    // if (DriverStation.getAlliance().get() == Alliance.Blue) {drivetrain.getPigeon2().setYaw(0);}
+    // else if (DriverStation.getAlliance().get() == Alliance.Red) {drivetrain.getPigeon2().setYaw(180);}
     RobotModeTriggers.autonomous().whileTrue(autos.pathConnectingTest().cmd());
         // SmartDashboard.putNumber("Current Draw Climber", motor.getOutputCurrent());
         publisher = NetworkTableInstance.getDefault()
@@ -155,13 +169,14 @@ public class RobotContainer {
                 .withRotationalRate(-joystick.getRightX() * MaxAngularRate)
             )
         );
+        joystick.rightTrigger().whileTrue(
         drivetrain.applyRequest(
             () ->
             drive
             .withVelocityX(joystick.getLeftY() * MaxSpeed*0.3) // Drive forward with negative Y (forward)
             .withVelocityY(joystick.getLeftX() * MaxSpeed*0.3) // Drive left with negative X (left)
             .withRotationalRate(-joystick.getRightX() * MaxAngularRate*0.3) // Drive counterclockwise with negative X (left)
-        );
+        ));
         // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
         // joystick.b().whileTrue(drivetrain.applyRequest(() ->
         //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
@@ -182,7 +197,10 @@ public class RobotContainer {
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
         // reset the field-centric heading on left bumper press
-        joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        joystick.start().onTrue(new InstantCommand(()->
+            drivetrain.getPigeon2().setYaw(180)
+        ));
+        // joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         // joystick.rightTrigger().whileTrue(
         //     new ParallelCommandGroup(
         //         new InstantCommand(() -> elevator.setSetpoint(1.01)),
@@ -213,14 +231,54 @@ public class RobotContainer {
             ),
             new RunCommand(() -> leds.setDef(false), leds)));
         joystick.leftBumper().whileTrue(new RunCommand(()->knuckle.score(), knuckle));
-        joystick.x().whileTrue(
+        joystick.y().whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> elevator.setSetpoint(0.2)),
-                new ArmToAngle(arm, 180)
+                new ArmToAngle(arm, 180),
+                new RunCommand(() -> knuckle.setKnuckleMotorHigh
+                (), knuckle)
             )
         );
-
-
+        joystick.povLeft().whileTrue(
+            drivetrain.applyRequest(
+            () ->
+            driveRR
+            .withVelocityX(0) // Drive forward with negative Y (forward)
+            .withVelocityY(0.75) // Drive left with negative X (left)
+            .withRotationalRate(0.) // Drive counterclockwise with negative X (left)
+        )
+        );
+        joystick.povRight().whileTrue(
+            drivetrain.applyRequest(
+            () ->
+            driveRR
+            .withVelocityX(0) // Drive forward with negative Y (forward)
+            .withVelocityY(-0.75) // Drive left with negative X (left)
+            .withRotationalRate(0.) // Drive counterclockwise with negative X (left)
+        )
+        );
+        joystick.povUp().whileTrue(
+            drivetrain.applyRequest(
+            () ->
+            driveRR
+            .withVelocityX(0.75) // Drive forward with negative Y (forward)
+            .withVelocityY(0) // Drive left with negative X (left)
+            .withRotationalRate(0.) // Drive counterclockwise with negative X (left)
+        )
+        );
+        joystick.povDown().whileTrue(
+            drivetrain.applyRequest(
+            () ->
+            driveRR
+            .withVelocityX(-0.75) // Drive forward with negative Y (forward)
+            .withVelocityY(0) // Drive left with negative X (left)
+            .withRotationalRate(0.) // Drive counterclockwise with negative X (left)
+        )
+        );
+        joystick.b().whileTrue(AutoBuilder.pathfindToPose(kREDSOURCERIGHT, constraints));
+        //joystick.x().whileTrue(AutoBuilder.pathfindToPose(kREDSOURCELEFT, constraints));
+        
+        // joystick.b().whileTrue(AutoBuilder.pathfindToPose(kRED0_1, constraints));
         //OPERATOR --------------------------------------------------------------------
         // operator.y().whileTrue(new ParallelCommandGroup(new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle), new RunCommand(() -> chute.runMotor(-0.3), chute)));
         // joystick.x().whileTrue(new RunCommand(() -> knuckle.score(), knuckle));
@@ -234,20 +292,20 @@ public class RobotContainer {
         new JoystickButton(operator, kL1).whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> elevator.setSetpoint(0.63)),
-                new ArmToAngle(arm, 65),
+                new ArmToAngle(arm, 80),
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
         );
         new JoystickButton(operator, kL2).whileTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> elevator.setSetpoint(0.3)),
+                new InstantCommand(() -> elevator.setSetpoint(0.25)),
                 new ArmToAngle(arm, 160),
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
         );
         new JoystickButton(operator, kL3).whileTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> elevator.setSetpoint(0.56)),
+                new InstantCommand(() -> elevator.setSetpoint(0.53)),
                 new ArmToAngle(arm, 160),
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
@@ -260,11 +318,31 @@ public class RobotContainer {
             )
         );
         new JoystickButton(operator, kAutoAlignLeft).whileTrue(new SequentialCommandGroup(
+            new AlignWithReef(drivetrain, driveRR),
             new DriveToReef(drivetrain, driveRR, true)
         ));
         new JoystickButton(operator, kAutoAlignRight).whileTrue(new SequentialCommandGroup(
-            new DriveToReef(drivetrain, driveRR, true)
+            new DriveToReef(drivetrain, driveRR, false)
         ));
+        new JoystickButton(operator, k0degrees).and(joystick.a()).whileTrue(
+            AutoBuilder.pathfindToPose(kRED6_7, constraints)
+        );
+        new JoystickButton(operator, k60degrees).and(joystick.a()).whileTrue(
+            AutoBuilder.pathfindToPose(kRED4_5, constraints)
+        );
+        new JoystickButton(operator, k120degrees).and(joystick.a()).whileTrue(
+            AutoBuilder.pathfindToPose(kRED2_3, constraints)
+        );
+        new JoystickButton(operator, k180degrees).and(joystick.a()).whileTrue(
+            AutoBuilder.pathfindToPose(kRED0_1, constraints)
+        );
+        new JoystickButton(operator, k240degrees).and(joystick.a()).whileTrue(
+            AutoBuilder.pathfindToPose(kRED10_11, constraints)
+        );
+        new JoystickButton(operator, k300degrees).and(joystick.a()).whileTrue(
+            AutoBuilder.pathfindToPose(kRED8_9, constraints)
+        );
+        // SmartDashboard.putNumber("null", operator.getY());
         //MANUAL -------------------------------------------------------------
         manual.povUp().whileTrue(
         new RunCommand(() -> elevator.increaseSetpoint(0.005))
@@ -282,7 +360,7 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
     }
     public void elevatorReset() {
-        elevator.setSetpoint(elevator.getSetpoint());
+        elevator.setSetpoint(0);
     }
 
     // public Command getAutonomousCommand() {

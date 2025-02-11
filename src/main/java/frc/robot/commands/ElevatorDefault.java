@@ -39,9 +39,7 @@ public class ElevatorDefault extends Command {
   // Called every time the scheduler runs while the command is scheduled
   @Override
   public void execute() {
-    speed = MathUtil.clamp(pidController.calculate(elevator.getElevatorPosition(), elevator.getSetpoint()), -0.3, 0.5);
-    SmartDashboard.putNumber("Controller output", speed);
-    SmartDashboard.putNumber("Setpoint", elevator.getSetpoint());
+    speed = MathUtil.clamp(pidController.calculate(elevator.getElevatorPosition(), elevator.getSetpoint()), -0.3, 0.6);
     elevator.runElevatorUp(speed, arm);
   }
 
