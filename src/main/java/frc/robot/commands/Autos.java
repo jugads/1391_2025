@@ -6,6 +6,9 @@ package frc.robot.commands;
 
 
 
+import static frc.robot.Constants.ReefPoses.K_CONSTRAINTS;
+import static frc.robot.Constants.ReefPoses.kRED2_3;
+
 import java.io.IOException;
 
 import org.json.simple.parser.ParseException;
@@ -173,48 +176,42 @@ public class Autos extends Command {
   return autoRoutine;
  }
 
- public AutoRoutine fbranchanddbranch() {
+ public Command fbranchanddbranch() {
 final AutoRoutine autoRoutine = autoFactory.newRoutine("fbranchanddbranch");
 final AutoTrajectory path = autoRoutine.trajectory("Start-FBranch");
 final AutoTrajectory path1 = autoRoutine.trajectory("FBranch-Source");
 final AutoTrajectory path2 = autoRoutine.trajectory("Source-DBranch");
 
- autoRoutine.active().onTrue(
-    path.resetOdometry()
-    .andThen(
-      new SequentialCommandGroup(
-        path.cmd(),
-        // new DriveToReef(drivetrain, driveRR, true), 
-        new ParallelCommandGroup( //score L3
-          new InstantCommand(() -> elevator.setSetpoint(0.53)),
-          new ArmToAngle(arm, 160),
-          new RunCommand(() -> knuckle.setKnuckleMotorLow())
-          ).until(() -> elevator.getElevatorPosition() > 0.51 && arm.getEncoderPosition() > 158),
-          new RunCommand(() -> knuckle.score()),
-         new ParallelCommandGroup(
-                new InstantCommand(() -> elevator.setSetpoint(0.2)),
-                new ArmToAngle(arm, 180)
-            )
-
-      )
-    )
-  );
-  return autoRoutine;
- }
- public Command spin() {
-  return Commands.sequence(
-    new SequentialCommandGroup(
+ return Commands.sequence(
+    // path.resetOdometry()
+     new SequentialCommandGroup(
       new InstantCommand(() -> drivetrain.resetGyro(0)),
-      new InstantCommand(() -> drivetrain.resetPose(new Pose2d(8.811853408813477,4.044926643371582, drivetrain.getPigeon2().getRotation2d())))
-    ),
-    autoFactory.trajectoryCmd("RStart-FBranch")
-    // autoFactory.trajectoryCmd("FBranch-Source"),
-    // autoFactory.trajectoryCmd("Source-DBranch"),
-    // autoFactory.trajectoryCmd("DBranch-Source"),
-    // autoFactory.trajectoryCmd("Source-CBranch")
-    );
-  
+      new ArmToAngle(arm, 160).until(() -> arm.getEncoderPosition()<180),
+      AutoBuilder.pathfindToPose(kRED2_3, K_CONSTRAINTS),
+      new WaitUntilCommand(() -> drivetrain.getState().Speeds.omegaRadiansPerSecond == 0),
+      new ParallelCommandGroup(
+        new InstantCommand(() -> elevator.setSetpoint(0.55)),
+        new ArmToAngle(arm, 168),
+        new RunCommand(() -> knuckle.setKnuckleMotorLow())
+      ).until(() -> elevator.getElevatorPosition() > 0.5),
+      new DriveToReef(drivetrain, driveRR, false),
+      new RunCommand(() -> knuckle.score())
+    ));
  }
+//  public Command spin() {
+//   return Commands.sequence(
+//     new SequentialCommandGroup(
+//       new InstantCommand(() -> drivetrain.resetGyro(0)),
+//       new InstantCommand(() -> drivetrain.resetPose(new Pose2d(8.811853408813477,4.044926643371582, drivetrain.getPigeon2().getRotation2d())))
+//     ),
+//     autoFactory.trajectoryCmd("RStart-FBranch")
+//     // autoFactory.trajectoryCmd("FBranch-Source"),
+//     // autoFactory.trajectoryCmd("Source-DBranch"),
+//     // autoFactory.trajectoryCmd("DBranch-Source"),
+//     // autoFactory.trajectoryCmd("Source-CBranch")
+//     );
+  
+//  }
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {}

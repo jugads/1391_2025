@@ -60,6 +60,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Notifier m_simNotifier = null;
     private Field2d field = new Field2d();
     private double m_lastSimTime;
+    boolean autonomousReset = false;
     // NetworkTable m_limelight = NetworkTableInstance.getDefault().getTable("limelight");
     NetworkTable m_limelightRear = NetworkTableInstance.getDefault().getTable("limelight-back");
     NetworkTable m_limelightFront = NetworkTableInstance.getDefault().getTable("limelight-front");
@@ -249,7 +250,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                                 ), 
                                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
                                 new PIDConstants(9.0, 0.0, 0.0), // Translation PID constants
-                                new PIDConstants(7.0, 0.0, 0.0)
+                                new PIDConstants(2.7, 0.0, 0.0)
             ), 
                                 config, 
                                 () -> {
@@ -341,9 +342,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     @Override
     public void periodic() {
         poseEstimator.update(getPigeon2().getRotation2d(), getModulePositions());
-        if (!DriverStation.isAutonomous()) {
+        // if (!DriverStation.isAutonomous()) {
         if (getTVFront()) {
-            if (Math.abs(getPose().getX() - getFrontLLPose().getX()) > 0.2) {
+            if (Math.abs(getPose().getX() - getFrontLLPose().getX()) > 0.5 || (Math.abs(getPose().getY() - getFrontLLPose().getY()) > 0.5)) {
             poseEstimator.resetPose(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()));
             }
             else {
@@ -351,7 +352,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             // SmartDashboard.putBoolean("Updating?", true);
             }
             // lastPose = new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d());
-        }
+        // }
         // if (getTVRear()) {
             
         //     poseEstimator.addVisionMeasurement(new Pose2d(getRearLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-(m_limelightRear.getEntry("tl").getDouble(0.))/1000);
@@ -375,7 +376,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {
                 setOperatorPerspectiveForward(
-                    allianceColor == Alliance.Red
+                    allianceColor == Alliance.Blue
                         ? kRedAlliancePerspectiveRotation
                         : kBlueAlliancePerspectiveRotation
                 );
@@ -488,7 +489,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         getPose(),
         Point
     );
-    PathConstraints constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+    PathConstraints constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 3 * Math.PI); // The constraints for this path.
     PathPlannerPath path = new PathPlannerPath(
         waypoints,
         constraints,
@@ -505,6 +506,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       }
       public void resetGyro(double angle) {
         getPigeon2().setYaw(angle);
+      }
+      public void resetAuton() {
+        autonomousReset = true;
       }
     //   public Pose2d getPoseIntegral(Pose2d previousPose) {
     //     var x = previousPose.getX();

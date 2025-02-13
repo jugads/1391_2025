@@ -56,8 +56,8 @@ public class Constants {
     public class ArmConstants{
         public static final int kMotorID = 3;
         public static final int kEncoderPort = 8;
-        public static final double kP = 0.17;
-        public static final double kI = 0.02;
+        public static final double kP = 0.18;
+        public static final double kI = 0.016;
         public static final double kD = 0;
         public static final double kTransferAngle = 0;
         public static final double kPDynamic = 0.006;
@@ -73,6 +73,6 @@ public class Constants {
         public static final Pose2d kRED10_11 = new Pose2d(12.14, 2.43, Rotation2d.fromDegrees(60));
         public static final Pose2d kREDSOURCERIGHT = new Pose2d(16.26, 7.1, Rotation2d.fromDegrees(-128));
         public static final Pose2d kREDSOURCELEFT = new Pose2d(16.42, 1, Rotation2d.fromDegrees(128));
-        public static final PathConstraints K_CONSTRAINTS = new PathConstraints(3.0, 3.0, 2*Math.PI, 4*Math.PI);
+        public static final PathConstraints K_CONSTRAINTS = new PathConstraints(3.0, 3.0, 2*Math.PI, 3*Math.PI);
     }
 }

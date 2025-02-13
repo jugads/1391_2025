@@ -103,8 +103,6 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     // private final  SendableChooser<Command> autoChooser;
     // SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(drivetrain.getKinematics(), new Rotation2d(logger.getCurrentRot()), drivetrain.getModulePositions(), drivetrain.getPoseLL());
-    StructPublisher<Pose2d> publisher;
-
     Arm arm = new Arm();
     AlgaeScorer algaeScorer = new AlgaeScorer();
     // Chute chute = new Chute();
@@ -119,16 +117,20 @@ public class RobotContainer {
 
     public RobotContainer() {
     // Add options to the chooser
-    // if (DriverStation.getAlliance().get() == Alliance.Blue) {drivetrain.getPigeon2().setYaw(0);}
-   // else if (DriverStation.getAlliance().get() == Alliance.Red) {drivetrain.getPigeon2().setYaw(180);}
-    RobotModeTriggers.autonomous().whileTrue(autos.fbranchanddbranch().cmd());
+    if (DriverStation.getAlliance().get() == Alliance.Blue) {drivetrain.getPigeon2().setYaw(0);}
+   else if (DriverStation.getAlliance().get() == Alliance.Red) {drivetrain.getPigeon2().setYaw(180);}
+    RobotModeTriggers.autonomous().whileTrue(autos.fbranchanddbranch());
         // SmartDashboard.putNumber("Current Draw Climber", motor.getOutputCurrent());
-        publisher = NetworkTableInstance.getDefault()
-        .getStructTopic("MyPose", Pose2d.struct).publish();
+        
         configureBindings();
         }
     public void publishPose() {
-        publisher.set(drivetrain.getPose());
+        var array = new double[] {
+            drivetrain.getPose().getX(),
+            drivetrain.getPose().getY(),
+            drivetrain.getPose().getRotation().getRadians(),
+        };
+        SmartDashboard.putNumberArray("MyPose", array);
         SmartDashboard.putNumber("GETTX", drivetrain.getTXFront());
     }
 
@@ -140,8 +142,8 @@ public class RobotContainer {
             drivetrain.applyRequest(
                 () ->
                 drive
-                .withVelocityX(joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                .withVelocityY(joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                .withVelocityX(joystick.getLeftY() * MaxSpeed * (DriverStation.getAlliance().get() == Alliance.Blue ? 1 : -1)) // Drive forward with negative Y (forward)
+                .withVelocityY(joystick.getLeftX() * MaxSpeed * (DriverStation.getAlliance().get() == Alliance.Blue ? 1 : -1)) // Drive left with negative X (left)
                 .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );

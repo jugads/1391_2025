@@ -15,7 +15,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveToReef extends Command {
   /** Creates a new DriveToReef. */
-  PIDController xController = new PIDController(0.03, 0., 0.0013);
+  PIDController xController = new PIDController(0.035, 0., 0.0013);
   PIDController yController = new PIDController(0.0065, 0., 0.0003);
   CommandSwerveDrivetrain drivetrain;
   SwerveRequest.RobotCentric drive;
@@ -32,7 +32,7 @@ public class DriveToReef extends Command {
   @Override
   public void initialize() {
     xController.setSetpoint(-8);
-    yController.setSetpoint(aligningLeft ? -16 : 16);
+    yController.setSetpoint(aligningLeft ? -17 : 22);
     xController.setTolerance(0.3);
     yController.setTolerance(0.3);
   }
@@ -50,11 +50,17 @@ public class DriveToReef extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    drivetrain.setControl(drive
+    .withVelocityX(0)
+    .withVelocityY(0)
+    .withRotationalRate(0.)
+    );
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return xController.atSetpoint() || !drivetrain.getTVFront();
+    return (Math.abs(yController.getSetpoint() - drivetrain.getTXFront()) < 9 && Math.abs(xController.getSetpoint() - drivetrain.getTXFront()) < 3) || !drivetrain.getTVFront();
   }
 }
