@@ -35,6 +35,11 @@ public class Constants {
         public static final double kCurrentThreshold = 30;
         public static final int kBeamBreakPort = 0;
     }
+    public class HopperConstants {
+        public static final int kBeltMotorID = 10;
+        public static final int kWheelMotorID = 9;
+        public static final int kBeamBreakPort = 0;
+    }
     public class AlgaeScorerConstants{
         public static final int kMotorID = 4;
         public static final double kCurrentThreshold = 20;
@@ -71,7 +76,7 @@ public class Constants {
         public static final Pose2d kRED6_7 = new Pose2d(15, 4, Rotation2d.fromDegrees(180));
         public static final Pose2d kRED8_9 = new Pose2d(14, 2.5, Rotation2d.fromDegrees(120));
         public static final Pose2d kRED10_11 = new Pose2d(12.14, 2.43, Rotation2d.fromDegrees(60));
-        public static final Pose2d kREDSOURCERIGHT = new Pose2d(16.26, 7.1, Rotation2d.fromDegrees(-128));
+        public static final Pose2d kREDSOURCERIGHT = new Pose2d(15.797, 6.709, Rotation2d.fromDegrees(-128));
         public static final Pose2d kREDSOURCELEFT = new Pose2d(16.42, 1, Rotation2d.fromDegrees(128));
         public static final PathConstraints K_CONSTRAINTS = new PathConstraints(3.0, 3.0, 2*Math.PI, 3*Math.PI);
     }

@@ -19,16 +19,16 @@ public class Leds extends SubsystemBase {
   Arm arm;
   AlgaeScorer algaeScorer;
   Knuckle knuckle;
-  Chute chute;
+  //Chute chute;
   boolean def = true;
   boolean transferring = false;
-  public Leds(AddressableLED leds, AddressableLEDBuffer buffer, Arm arm, Knuckle knuckle, AlgaeScorer algaeScorer, Chute chute) {
+  public Leds(AddressableLED leds, AddressableLEDBuffer buffer, Arm arm, Knuckle knuckle, AlgaeScorer algaeScorer) {
     this.leds = leds;
     this.buffer = buffer;
     this.arm = arm;
     this.algaeScorer = algaeScorer;
     this.knuckle = knuckle;
-    this.chute = chute;
+    //this.chute = chute;
     timer.start();
     leds.setLength(buffer.getLength());
     leds.setData(buffer);
@@ -80,9 +80,9 @@ public class Leds extends SubsystemBase {
     else if (algaeScorer.hasAlgae()) {
       setAll(Color.kMediumAquamarine);
     }
-    else if (chute.hasCoral()) {
-      flash(Color.kWhiteSmoke);
-    }
+    //else if (chute.hasCoral()) {
+     // flash(Color.kWhiteSmoke);
+   // }
     else if (knuckle.hasCoral() && algaeScorer.hasAlgae()) {
       setAll(Color.kChartreuse);
     }

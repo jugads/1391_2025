@@ -48,10 +48,13 @@ import frc.robot.commands.AlgaeDefault;
 import frc.robot.commands.ArmDefault;
 import frc.robot.commands.ArmToAngle;
 import frc.robot.commands.Autos;
+import frc.robot.commands.ClampedArmToAngle;
 import frc.robot.commands.DriveToPoint;
 import frc.robot.commands.DriveToReef;
 import frc.robot.commands.ElevatorDefault;
 import frc.robot.commands.FollowPath;
+import frc.robot.commands.HopperDefault;
+import frc.robot.commands.HopperIntake;
 import frc.robot.commands.ElevatorDefault;
 import frc.robot.commands.KnuckleDefault;
 import frc.robot.commands.MoveArm;
@@ -75,9 +78,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.AlgaeScorer;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Chute;
+//import frc.robot.subsystems.Chute;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Knuckle;
 import frc.robot.subsystems.Leds;
 public class RobotContainer {
@@ -108,9 +112,10 @@ public class RobotContainer {
     // Chute chute = new Chute();
     Elevator elevator = new Elevator();
     Knuckle knuckle = new Knuckle();
-    Chute chute = new Chute();
-    Leds leds = new Leds(new AddressableLED(5), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer, chute);
-    Autos autos = new Autos(drivetrain, driveRR, arm, elevator, knuckle, chute, leds);
+    //Chute chute = new Chute();
+    Hopper hopper = new Hopper();
+    Leds leds = new Leds(new AddressableLED(5), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer);
+    Autos autos = new Autos(drivetrain, driveRR, arm, elevator, knuckle, leds);
 
     PathConstraints constraints = new PathConstraints(3.0, 3.0, 2*Math.PI, 4*Math.PI);
 
@@ -155,14 +160,19 @@ public class RobotContainer {
         );
         algaeScorer.setDefaultCommand(new AlgaeDefault(algaeScorer));
         arm.setDefaultCommand(new ArmDefault(arm, arm.getEncoderPosition()));
-        chute.setDefaultCommand(new InstantCommand(() -> chute.stopMotor(), chute));
+       // chute.setDefaultCommand(new InstantCommand(() -> chute.stopMotor(), chute));
+        hopper.setDefaultCommand(new HopperDefault(hopper));
         leds.setDefaultCommand(
             new InstantCommand(() ->
             leds.setDef(true), leds)
         );
 
         //DRIVER ------------------------------------------------------------------------------
-        joystick.rightBumper().whileTrue(
+       joystick.rightBumper().whileTrue(
+        new RunCommand(() -> hopper.bothAtSameTime(0.2, 1), hopper)
+    .until(()-> hopper.hasCoralHopper()));
+
+        /* joystick.rightBumper().whileTrue(
             drivetrain.applyRequest(
                 () -> 
                 driveRR
@@ -170,7 +180,7 @@ public class RobotContainer {
                 .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                 .withRotationalRate(-joystick.getRightX() * MaxAngularRate)
             )
-        );
+        ); */
         joystick.rightTrigger().whileTrue(
         drivetrain.applyRequest(
             () ->
@@ -211,7 +221,7 @@ public class RobotContainer {
         //     )
         // );
         // operator.start().whileTrue(new RunCommand(() -> chute.runMotor(-0.4), chute).until(() -> chute.hasCoral()));
-        joystick.leftTrigger().whileTrue(new ParallelCommandGroup(
+        /* joystick.leftTrigger().whileTrue(new ParallelCommandGroup(
             new SequentialCommandGroup(
             new InstantCommand(() -> elevator.setSetpoint(0.73)),
             new WaitUntilCommand(() -> elevator.getElevatorPosition() > 0.68),
@@ -231,14 +241,34 @@ public class RobotContainer {
             new WaitUntilCommand(() -> arm.getEncoderPosition()>130),
             new InstantCommand(() -> elevator.setSetpoint(0.08))
             ),
-            new RunCommand(() -> leds.setDef(false), leds)));
+            new RunCommand(() -> leds.setDef(false), leds))); */
+        joystick.leftTrigger().whileTrue(
+            new SequentialCommandGroup(
+     new InstantCommand(() -> elevator.setSetpoint(0.54)),
+      new WaitUntilCommand(() -> elevator.getElevatorPosition() > 0.51
+      ),
+      new ArmToAngle(arm, 8).until(() -> arm.getEncoderPosition()<11),
+      new ParallelCommandGroup(
+        new RunCommand(() -> hopper.bothAtSameTime(0.5, 1), hopper),
+        new RunCommand(() -> knuckle.runMotor(1), knuckle)
+      ).until(() -> knuckle.hasCoral()),
+      new ParallelCommandGroup(
+      new SequentialCommandGroup(
+                new InstantCommand(() -> elevator.setSetpoint(0.2)),
+                new ArmToAngle(arm, 180)
+            ),
+         new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle)
+        )
+    ) 
+      
+        );
+        
         joystick.leftBumper().whileTrue(new RunCommand(()->knuckle.score(), knuckle));
         joystick.y().whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> elevator.setSetpoint(0.2)),
                 new ArmToAngle(arm, 180),
-                new RunCommand(() -> knuckle.setKnuckleMotorHigh
-                (), knuckle)
+                new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle)
             )
         );
         joystick.povLeft().whileTrue(
@@ -345,20 +375,26 @@ public class RobotContainer {
         );
         // SmartDashboard.putNumber("null", operator.getY());
         //MANUAL -------------------------------------------------------------
-      /*  manual.povUp().whileTrue(
+        manual.povUp().whileTrue(
         new RunCommand(() -> elevator.increaseSetpoint(0.005))
         );
         manual.povDown().whileTrue(
         new RunCommand(() -> elevator.increaseSetpoint(-0.005))
         );
         manual.leftTrigger().whileTrue(
-        new RunCommand(() -> arm.runMotor(-0.05))
+        new RunCommand(() -> arm.runMotor(-0.3))
         );
         
         manual.rightTrigger().whileTrue(
-        new RunCommand(() -> arm.runMotor(0.1))
+        new RunCommand(() -> arm.runMotor(0.3))
         );
-        drivetrain.registerTelemetry(logger::telemeterize); */
+        drivetrain.registerTelemetry(logger::telemeterize); 
+        manual.a().whileTrue(
+        new ClampedArmToAngle(arm, 110, 0.5)
+        );
+        manual.b().whileTrue(
+        new ClampedArmToAngle(arm, 110, 1)
+        );
     } 
     public void elevatorReset() {
         elevator.setSetpoint(0);

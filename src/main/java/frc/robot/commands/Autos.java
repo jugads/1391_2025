@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Chute;
+//import frc.robot.subsystems.Chute;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Knuckle;
@@ -51,18 +51,18 @@ public class Autos extends Command {
   Arm arm;
   Elevator elevator;
   Knuckle knuckle;
-  Chute chute;
+ // Chute chute;
   Leds leds;
   
   
   /** Creates a new Autos. */
-  public Autos(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric driveRR, Arm arm, Elevator elevator, Knuckle knuckle, Chute chute, Leds leds) {
+  public Autos(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric driveRR, Arm arm, Elevator elevator, Knuckle knuckle, Leds leds) {
      // The drive subsystem
      this.drivetrain = drivetrain;
      this.arm = arm;
      this.elevator = elevator;
      this.knuckle = knuckle;
-     this.chute = chute;
+     //this.chute = chute;
      this.leds = leds;
      this. driveRR = driveRR;
 
@@ -83,7 +83,7 @@ public class Autos extends Command {
  }
 
 
- public AutoRoutine pathConnectingTest() {
+ /* public AutoRoutine pathConnectingTest() {
   final AutoRoutine autoRoutine = autoFactory.newRoutine("Path Connecting Test");
   final AutoTrajectory path = autoRoutine.trajectory("BStart-FBranch");
   final AutoTrajectory path1 = autoRoutine.trajectory("BFBranch-Source");
@@ -175,7 +175,7 @@ public class Autos extends Command {
   );
   return autoRoutine;
  }
-
+*/
  public Command fbranchanddbranch() {
 final AutoRoutine autoRoutine = autoFactory.newRoutine("fbranchanddbranch");
 final AutoTrajectory path = autoRoutine.trajectory("Start-FBranch");

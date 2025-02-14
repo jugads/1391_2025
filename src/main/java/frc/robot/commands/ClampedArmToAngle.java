@@ -11,17 +11,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import static frc.robot.Constants.ArmConstants.*;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ArmToAngle extends Command {
+public class ClampedArmToAngle extends Command {
     /** Creates a new ArmToAngle. */
     PIDController controller;
     Arm m_arm;
     double desiredArmAngle;
-   
-    public ArmToAngle(Arm arm, double armAngle) {
+    double maxSpeed;
+    double speed =0;
+    public ClampedArmToAngle(Arm arm, double armAngle, double maxSpeed) {
       m_arm = arm;
   
         // desiredArmAngle = m_arm.getEncoderPosition();      
-      
+      this.maxSpeed = maxSpeed;
       desiredArmAngle = armAngle;
 
       controller = new PIDController(kPDynamic, kIDynamic, kDDynamic);
@@ -42,7 +43,8 @@ public class ArmToAngle extends Command {
   public void execute() {
     m_arm.setSetpoint(desiredArmAngle);
     if (m_arm.getEncoderPosition() != 360.) {
-    m_arm.runMotor(controller.calculate(m_arm.getEncoderPosition()));
+    speed = MathUtil.clamp(controller.calculate(m_arm.getEncoderPosition()), 0 , maxSpeed);
+    m_arm.runMotor(speed);
     }
     SmartDashboard.putBoolean("Arm At angle", controller.atSetpoint());
   }
