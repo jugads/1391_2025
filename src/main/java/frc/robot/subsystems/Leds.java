@@ -58,7 +58,7 @@ public class Leds extends SubsystemBase {
   
   else {
     
-    if (def == false) {
+   
     LEDPattern base = LEDPattern.gradient(GradientType.kContinuous, Color.kBlack, Color.kChartreuse);
     LEDPattern pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(25));
 
@@ -74,9 +74,9 @@ public class Leds extends SubsystemBase {
         int value = (int) ((Math.sin(time * 3 + i * 0.5) * 0.5 + 0.5) * 255); // Wave effect
         buffer.setLED(i, Color.fromHSV(hue, saturation, value));
       } */
-    } 
+    
      
-    else if (arm.atTransferAngle()) {
+    if (arm.atTransferAngle()) {
       setAll(Color.kFirebrick);
     }
     else if (knuckle.hasCoral()) {
@@ -94,9 +94,9 @@ public class Leds extends SubsystemBase {
    /* else if (def == false ) {
       flash(Color.kChartreuse);
     } */
-    else {
-      flash(Color.kDarkRed);
-    }
+    // else {
+    //   flash(Color.kDarkRed);
+    // }
   }
     // This method will be called once per scheduler run
   }
