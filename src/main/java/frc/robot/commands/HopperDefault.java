@@ -26,7 +26,6 @@ public class HopperDefault extends Command {
   public void execute() {
     hopper.stopWheelMotor();
     hopper.stopBeltMotor();
-    
   }
 
   // Called once the command ends or is interrupted.

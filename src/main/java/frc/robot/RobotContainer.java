@@ -168,11 +168,11 @@ public class RobotContainer {
         );
 
         //DRIVER ------------------------------------------------------------------------------
-       joystick.rightBumper().whileTrue(
+       joystick.x().whileTrue(
         new RunCommand(() -> hopper.bothAtSameTime(0.2, 1), hopper)
     .until(()-> hopper.hasCoralHopper()));
 
-        /* joystick.rightBumper().whileTrue(
+        joystick.rightBumper().whileTrue(
             drivetrain.applyRequest(
                 () -> 
                 driveRR
@@ -180,7 +180,7 @@ public class RobotContainer {
                 .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                 .withRotationalRate(-joystick.getRightX() * MaxAngularRate)
             )
-        ); */
+        );
         joystick.rightTrigger().whileTrue(
         drivetrain.applyRequest(
             () ->
@@ -310,7 +310,6 @@ public class RobotContainer {
         joystick.b().whileTrue(AutoBuilder.pathfindToPose(kREDSOURCERIGHT, constraints));
         //joystick.x().whileTrue(AutoBuilder.pathfindToPose(kREDSOURCELEFT, constraints));
         
-        // joystick.b().whileTrue(AutoBuilder.pathfindToPose(kRED0_1, constraints));
         //OPERATOR --------------------------------------------------------------------
         // operator.y().whileTrue(new ParallelCommandGroup(new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle), new RunCommand(() -> chute.runMotor(-0.3), chute)));
         // joystick.x().whileTrue(new RunCommand(() -> knuckle.score(), knuckle));

@@ -28,7 +28,7 @@ beambrake = new DigitalInput(kBeamBreakPort);
   public void periodic() {
 
     // This method will be called once per scheduler run
-SmartDashboard.putBoolean("BeamBrake", hasCoralHopper());
+    SmartDashboard.putBoolean("BeamBrake", hasCoralHopper());
 
   }
   public void runBeltMotor(double speed) {
