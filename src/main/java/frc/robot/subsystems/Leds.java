@@ -7,9 +7,12 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static edu.wpi.first.units.Units.*;
 
 public class Leds extends SubsystemBase {
   /** Creates a new Leds. */
@@ -56,19 +59,21 @@ public class Leds extends SubsystemBase {
   else {
     
     if (def == false) {
-     double time = timer.get();
+    LEDPattern base = LEDPattern.gradient(GradientType.kContinuous, Color.kBlack, Color.kChartreuse);
+    LEDPattern pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(25));
+
+    pattern.applyTo(buffer);
+    leds.setData(buffer);
+    /*  double time = timer.get();
     int length = buffer.getLength();
 
     for (int i = 0; i < length; i++) {
         // Keep hues around chartreuse (~90°) and slightly oscillate over time
-        int baseHue = 90; // Chartreuse (yellow-green)
-        int hueVariation = 10; // Adjust for slight color variation (smaller values = steadier color)
-        int hue = baseHue + (int) (Math.sin(time * 2) * hueVariation); // Smooth oscillation
-
+        int hue = 90; // Chartreuse (yellow-green)
         int saturation = 255; // Full saturation
-        int value = 50; // Moderate brightness
+        int value = (int) ((Math.sin(time * 3 + i * 0.5) * 0.5 + 0.5) * 255); // Wave effect
         buffer.setLED(i, Color.fromHSV(hue, saturation, value));
-      }
+      } */
     } 
      
     else if (arm.atTransferAngle()) {

@@ -243,6 +243,7 @@ public class RobotContainer {
             ),
             new RunCommand(() -> leds.setDef(false), leds))); */
         joystick.leftTrigger().whileTrue(
+            new ParallelCommandGroup(
             new SequentialCommandGroup(
      new InstantCommand(() -> elevator.setSetpoint(0.54)),
       new WaitUntilCommand(() -> elevator.getElevatorPosition() > 0.51
@@ -259,8 +260,9 @@ public class RobotContainer {
             ),
          new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle)
         )
-    ) 
-      
+    ),
+     new RunCommand(() -> leds.setDef(false))
+            )
         );
         
         joystick.leftBumper().whileTrue(new RunCommand(()->knuckle.score(), knuckle));
