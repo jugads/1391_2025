@@ -119,7 +119,6 @@ public class RobotContainer {
 
     PathConstraints constraints = new PathConstraints(3.0, 3.0, 2*Math.PI, 4*Math.PI);
 
-
     public RobotContainer() {
     // Add options to the chooser
     if (DriverStation.getAlliance().get() == Alliance.Blue) {drivetrain.getPigeon2().setYaw(0);}
@@ -136,7 +135,7 @@ public class RobotContainer {
             drivetrain.getPose().getRotation().getRadians(),
         };
         SmartDashboard.putNumberArray("MyPose", array);
-        SmartDashboard.putNumber("GETTX", drivetrain.getTXFront());
+        // SmartDashboard.putNumber("GETTX", drivetrain.getTXFront());
     }
 
     private void configureBindings() {
@@ -147,8 +146,8 @@ public class RobotContainer {
             drivetrain.applyRequest(
                 () ->
                 drive
-                .withVelocityX(joystick.getLeftY() * MaxSpeed * (DriverStation.getAlliance().get() == Alliance.Blue ? 1 : -1)) // Drive forward with negative Y (forward)
-                .withVelocityY(joystick.getLeftX() * MaxSpeed * (DriverStation.getAlliance().get() == Alliance.Blue ? 1 : -1)) // Drive left with negative X (left)
+                .withVelocityX(joystick.getLeftY() * MaxSpeed * (DriverStation.getAlliance().get() == Alliance.Blue ? 1 : 1)) // Drive forward with negative Y (forward)
+                .withVelocityY(joystick.getLeftX() * MaxSpeed * (DriverStation.getAlliance().get() == Alliance.Blue ? 1 : 1)) // Drive left with negative X (left)
                 .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -159,7 +158,7 @@ public class RobotContainer {
             new KnuckleDefault(knuckle)
         );
         algaeScorer.setDefaultCommand(new AlgaeDefault(algaeScorer));
-        arm.setDefaultCommand(new ArmDefault(arm, arm.getEncoderPosition()));
+        arm.setDefaultCommand(new ArmToAngle(arm, arm.getSetpoint()));
        // chute.setDefaultCommand(new InstantCommand(() -> chute.stopMotor(), chute));
         hopper.setDefaultCommand(new HopperDefault(hopper));
         leds.setDefaultCommand(
@@ -169,8 +168,7 @@ public class RobotContainer {
 
         //DRIVER ------------------------------------------------------------------------------
        joystick.x().whileTrue(
-        new RunCommand(() -> hopper.bothAtSameTime(0.2, 1), hopper)
-    .until(()-> hopper.hasCoralHopper()));
+        new RunCommand(() -> hopper.bothAtSameTime(0.2, 1), hopper).until(() -> hopper.hasCoralHopper()));
 
         joystick.rightBumper().whileTrue(
             drivetrain.applyRequest(
@@ -242,28 +240,27 @@ public class RobotContainer {
             new InstantCommand(() -> elevator.setSetpoint(0.08))
             ),
             new RunCommand(() -> leds.setDef(false), leds))); */
-        joystick.leftTrigger().whileTrue(
-            new ParallelCommandGroup(
-            new SequentialCommandGroup(
-     new InstantCommand(() -> elevator.setSetpoint(0.54)),
-      new WaitUntilCommand(() -> elevator.getElevatorPosition() > 0.51
-      ),
-      new ArmToAngle(arm, 8).until(() -> arm.getEncoderPosition()<11),
-      new ParallelCommandGroup(
-        new RunCommand(() -> hopper.bothAtSameTime(0.5, 1), hopper),
-        new RunCommand(() -> knuckle.runMotor(1), knuckle)
-      ).until(() -> knuckle.hasCoral()),
-      new ParallelCommandGroup(
-      new SequentialCommandGroup(
-                new InstantCommand(() -> elevator.setSetpoint(0.2)),
-                new ArmToAngle(arm, 180)
-            ),
-         new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle)
-        )
-    ),
-     new RunCommand(() -> leds.setDef(false))
+            joystick.leftTrigger().whileTrue(
+                new SequentialCommandGroup(
+         new InstantCommand(() -> elevator.setSetpoint(0.54)),
+          new WaitUntilCommand(() -> elevator.getElevatorPosition() > 0.51
+          ),
+          new ArmToAngle(arm, 8).until(() -> arm.getEncoderPosition()<11),
+          new ParallelCommandGroup(
+            new RunCommand(() -> hopper.bothAtSameTime(0.5, 1), hopper),
+            new RunCommand(() -> knuckle.runMotor(1), knuckle)
+          ).until(() -> knuckle.hasCoral()),
+          new InstantCommand(() -> elevator.setSetpoint(0.6)).until(() -> elevator.getElevatorPosition() > 0.55),
+          new ParallelCommandGroup(
+          new SequentialCommandGroup(
+                    new InstantCommand(() -> elevator.setSetpoint(0.2)),
+                    new ArmToAngle(arm, 180)
+                ),
+             new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle)
             )
-        );
+        ) 
+          
+            );
         
         joystick.leftBumper().whileTrue(new RunCommand(()->knuckle.score(), knuckle));
         joystick.y().whileTrue(
@@ -331,15 +328,15 @@ public class RobotContainer {
         );
         new JoystickButton(operator, kL2).whileTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> elevator.setSetpoint(0.25)),
-                new ArmToAngle(arm, 160),
+                new InstantCommand(() -> elevator.setSetpoint(0.21)),
+                new ArmToAngle(arm, 170),
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
         );
         new JoystickButton(operator, kL3).whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> elevator.setSetpoint(0.53)),
-                new ArmToAngle(arm, 160),
+                new ArmToAngle(arm, 170),
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
         );
@@ -351,28 +348,48 @@ public class RobotContainer {
             )
         );
         new JoystickButton(operator, kAutoAlignLeft).whileTrue(
+            new SequentialCommandGroup(
+            new AlignWithReef(drivetrain, driveRR, drivetrain.getTIDFront()),
             new DriveToReef(drivetrain, driveRR, true)
-        );
+        ));
         new JoystickButton(operator, kAutoAlignRight).whileTrue(
             new DriveToReef(drivetrain, driveRR, false)
         );
         new JoystickButton(operator, k0degrees).and(joystick.a()).whileTrue(
-            AutoBuilder.pathfindToPose(kRED6_7, constraints)
+            new SequentialCommandGroup(
+            AutoBuilder.pathfindToPose(kRED6_7, constraints),
+            new AlignWithReef(drivetrain, driveRR, 7)
+            )
         );
         new JoystickButton(operator, k60degrees).and(joystick.a()).whileTrue(
-            AutoBuilder.pathfindToPose(kRED4_5, constraints)
+            new SequentialCommandGroup(
+            AutoBuilder.pathfindToPose(kRED4_5, constraints),
+            new AlignWithReef(drivetrain, driveRR, 8)
+            )
         );
         new JoystickButton(operator, k120degrees).and(joystick.a()).whileTrue(
-            AutoBuilder.pathfindToPose(kRED2_3, constraints)
+            new SequentialCommandGroup(
+            AutoBuilder.pathfindToPose(kRED2_3, constraints),
+            new AlignWithReef(drivetrain, driveRR, 9)
+            )
         );
         new JoystickButton(operator, k180degrees).and(joystick.a()).whileTrue(
-            AutoBuilder.pathfindToPose(kRED0_1, constraints)
+            new SequentialCommandGroup(
+            AutoBuilder.pathfindToPose(kRED0_1, constraints),
+            new AlignWithReef(drivetrain, driveRR, 10)
+            )
         );
         new JoystickButton(operator, k240degrees).and(joystick.a()).whileTrue(
-            AutoBuilder.pathfindToPose(kRED10_11, constraints)
+            new SequentialCommandGroup(
+            AutoBuilder.pathfindToPose(kRED10_11, constraints),
+            new AlignWithReef(drivetrain, driveRR, 11)
+            )
         );
         new JoystickButton(operator, k300degrees).and(joystick.a()).whileTrue(
-            AutoBuilder.pathfindToPose(kRED8_9, constraints)
+            new SequentialCommandGroup(
+            AutoBuilder.pathfindToPose(kRED8_9, constraints),
+            new AlignWithReef(drivetrain, driveRR, 12)
+            )
         );
         // SmartDashboard.putNumber("null", operator.getY());
         //MANUAL -------------------------------------------------------------
@@ -399,6 +416,7 @@ public class RobotContainer {
     } 
     public void elevatorReset() {
         elevator.setSetpoint(0);
+        arm.setSetpoint(arm.getEncoderPosition());
     }
 
     // public Command getAutonomousCommand() {

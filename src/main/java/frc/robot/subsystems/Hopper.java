@@ -18,6 +18,7 @@ public class Hopper extends SubsystemBase {
   SparkMax beltMotor;
   SparkMax wheelMotor;
   DigitalInput beambrake;
+  double timer = 0;
   public Hopper() {
 beltMotor = new SparkMax(kBeltMotorID, MotorType.kBrushless);
 wheelMotor = new SparkMax(kWheelMotorID, MotorType.kBrushless);
@@ -46,6 +47,17 @@ beambrake = new DigitalInput(kBeamBreakPort);
   public void bothAtSameTime(double wheelSpeed, double beltSpeed) {
     beltMotor.set(beltSpeed);
     wheelMotor.set(wheelSpeed);
+  }
+  public void setup() {
+    timer+=1;
+    if (timer == 15) {
+    beltMotor.set(0.);
+    timer = 0;
+    }
+    else if (timer > 3) {
+      beltMotor.set(1.);
+      wheelMotor.set(0.2);
+    }
   }
   public boolean hasCoralHopper() {
     return !beambrake.get();

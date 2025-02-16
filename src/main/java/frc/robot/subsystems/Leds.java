@@ -58,7 +58,7 @@ public class Leds extends SubsystemBase {
   
   else {
     
-   
+   if (def == false) {
     LEDPattern base = LEDPattern.gradient(GradientType.kContinuous, Color.kBlack, Color.kChartreuse);
     LEDPattern pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(25));
 
@@ -75,7 +75,7 @@ public class Leds extends SubsystemBase {
         buffer.setLED(i, Color.fromHSV(hue, saturation, value));
       } */
     
-     
+   }
     if (arm.atTransferAngle()) {
       setAll(Color.kFirebrick);
     }
@@ -94,9 +94,9 @@ public class Leds extends SubsystemBase {
    /* else if (def == false ) {
       flash(Color.kChartreuse);
     } */
-    // else {
-    //   flash(Color.kDarkRed);
-    // }
+    else {
+      flash(Color.kDarkRed);
+    }
   }
     // This method will be called once per scheduler run
   }

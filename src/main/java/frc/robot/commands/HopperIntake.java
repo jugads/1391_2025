@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -13,8 +14,10 @@ import frc.robot.subsystems.Hopper;
 public class HopperIntake extends Command {
   /** Creates a new HopperIntake. */
   Hopper hopper;
+  Timer timer;
   public HopperIntake(Hopper hopper) {
     this.hopper = new Hopper();
+    timer = new Timer();
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(hopper);
   }
@@ -22,12 +25,13 @@ public class HopperIntake extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
+    timer.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    
     new SequentialCommandGroup(
       new RunCommand(() -> hopper.runBeltMotor(1)),
       new RunCommand(() -> hopper.runWheelMotor(0.2))

@@ -15,11 +15,12 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveToReef extends Command {
   /** Creates a new DriveToReef. */
-  PIDController xController = new PIDController(0.035, 0., 0.0013);
-  PIDController yController = new PIDController(0.0065, 0., 0.0003);
+  PIDController xController = new PIDController(0.02, 0., 0.0013);
+  PIDController yController = new PIDController(0.0035, 0., 0.0003);
   CommandSwerveDrivetrain drivetrain;
   SwerveRequest.RobotCentric drive;
   boolean aligningLeft;
+
   public DriveToReef(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric drive, boolean aligningLeft) {
     this.drivetrain = drivetrain;
     this.drive = drive;
@@ -31,8 +32,8 @@ public class DriveToReef extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    xController.setSetpoint(-8);
-    yController.setSetpoint(aligningLeft ? -17 : 22);
+    xController.setSetpoint(aligningLeft ? -15 : -6);
+    yController.setSetpoint(aligningLeft ? -10 : 15);
     xController.setTolerance(0.3);
     yController.setTolerance(0.3);
   }
@@ -42,8 +43,8 @@ public class DriveToReef extends Command {
   @Override
   public void execute() {
     drivetrain.setControl(drive
-    .withVelocityX(-kMaxSpeed*xController.calculate(drivetrain.getTYFront()))
-    .withVelocityY(-kMaxSpeed * yController.calculate(drivetrain.getTXFront()))
+    .withVelocityX(-kMaxSpeed*xController.calculate(aligningLeft ? drivetrain.getTYRight() : drivetrain.getTYLeft()))
+    .withVelocityY(-kMaxSpeed * yController.calculate(aligningLeft ? drivetrain.getTXRight() : drivetrain.getTXLeft()))
     .withRotationalRate(0.)
     );
     }
@@ -61,6 +62,6 @@ public class DriveToReef extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (Math.abs(yController.getSetpoint() - drivetrain.getTXFront()) < 9 && Math.abs(xController.getSetpoint() - drivetrain.getTXFront()) < 3) || !drivetrain.getTVFront();
+    return xController.atSetpoint() || (aligningLeft ? !drivetrain.getTVRight() : !drivetrain.getTVLeft());
   }
 }

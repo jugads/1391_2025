@@ -60,7 +60,7 @@ public class Constants {
     }
     public class ArmConstants{
         public static final int kMotorID = 3;
-        public static final int kEncoderPort = 8;
+        public static final int kEncoderPort = 7;
         public static final double kP = 0.18;
         public static final double kI = 0.016;
         public static final double kD = 0;
@@ -68,11 +68,15 @@ public class Constants {
         public static final double kPDynamic = 0.006;
         public static final double kIDynamic = 0.0;
         public static final double kDDynamic = 0.00035;
+        public static final double kG = 0.0;
+        public static final double kV = 0.0;
+        public static final double kEncoderOffset = 0.25;
+
     }
     public class ReefPoses {
         public static final Pose2d kRED0_1 = new Pose2d(11.1, 4.25, Rotation2d.fromDegrees(0));
         public static final Pose2d kRED2_3 = new Pose2d(12, 5.6, Rotation2d.fromDegrees(-60));
-        public static final Pose2d kRED4_5 = new Pose2d(14, 5.7, Rotation2d.fromDegrees(-120));
+        public static final Pose2d kRED4_5 = new Pose2d(13.9, 5.6, Rotation2d.fromDegrees(-120));
         public static final Pose2d kRED6_7 = new Pose2d(15, 4, Rotation2d.fromDegrees(180));
         public static final Pose2d kRED8_9 = new Pose2d(14, 2.5, Rotation2d.fromDegrees(120));
         public static final Pose2d kRED10_11 = new Pose2d(12.14, 2.43, Rotation2d.fromDegrees(60));

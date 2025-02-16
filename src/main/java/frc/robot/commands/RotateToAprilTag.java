@@ -36,7 +36,7 @@ public class RotateToAprilTag extends Command {
   public void execute() {
     drivetrain.setControl(
     drive
-    .withRotationalRate(-controller.calculate(drivetrain.getTXFront()))
+    // .withRotationalRate(-controller.calculate(drivetrain.getTXFront()))
     );
   }
 
@@ -47,6 +47,6 @@ public class RotateToAprilTag extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(drivetrain.getTXFront()) <= 3;
+    return false;
   }
 }

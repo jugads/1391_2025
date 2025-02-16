@@ -62,8 +62,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private double m_lastSimTime;
     boolean autonomousReset = false;
     // NetworkTable m_limelight = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTable m_limelightRear = NetworkTableInstance.getDefault().getTable("limelight-back");
-    NetworkTable m_limelightFront = NetworkTableInstance.getDefault().getTable("limelight-front");
+    NetworkTable m_limelightRight = NetworkTableInstance.getDefault().getTable("limelight-fright");
+    NetworkTable m_limelightLeft = NetworkTableInstance.getDefault().getTable("limelight-fleft");
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
@@ -74,7 +74,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Pose2d lastPose;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
-    SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(getKinematics(), getPigeon2().getRotation2d(), getModulePositions(), getRearLLPose());
+    SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(getKinematics(), getPigeon2().getRotation2d(), getModulePositions(), getRightLLPose());
     private final SwerveRequest.ApplyRobotSpeeds m_ApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
     /* Swerve requests to apply during SysId characterization */
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
@@ -343,27 +343,36 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void periodic() {
         poseEstimator.update(getPigeon2().getRotation2d(), getModulePositions());
         // if (!DriverStation.isAutonomous()) {
-        if (getTVFront()) {
-            if (Math.abs(getPose().getX() - getFrontLLPose().getX()) > 0.5 || (Math.abs(getPose().getY() - getFrontLLPose().getY()) > 0.5)) {
-            poseEstimator.resetPose(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()));
+        if (getTVLeft()) {
+            if (Math.abs(getPose().getX() - getLeftLLPose().getX()) > 0.5 || (Math.abs(getPose().getY() - getLeftLLPose().getY()) > 0.5)) {
+        poseEstimator.resetPose(new Pose2d(getLeftLLPose().getTranslation(), getPigeon2().getRotation2d()));
             }
             else {
-            poseEstimator.addVisionMeasurement(new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-(m_limelightFront.getEntry("tl").getDouble(0.))/1000);
-            // SmartDashboard.putBoolean("Updating?", true);
+            poseEstimator.addVisionMeasurement(new Pose2d(getLeftLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-(m_limelightLeft.getEntry("tl").getDouble(0.))/1000);
+            SmartDashboard.putBoolean("Updating?", true);
             }
-            // lastPose = new Pose2d(getFrontLLPose().getTranslation(), getPigeon2().getRotation2d());
+            // lastPose = new Pose2d(getLeftLLPose().getTranslation(), getPigeon2().getRotation2d());
+        }
+        // if (getTVRight()) {
+        //     if (Math.abs(getPose().getX() - getRightLLPose().getX()) > 0.5 || (Math.abs(getPose().getY() - getRightLLPose().getY()) > 0.5)) {
+        // poseEstimator.resetPose(new Pose2d(getRightLLPose().getTranslation(), getPigeon2().getRotation2d()));
+        //     }
+        //     else {
+        //     poseEstimator.addVisionMeasurement(new Pose2d(getRightLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-(m_limelightRight.getEntry("tl").getDouble(0.))/1000);
+        //     SmartDashboard.putBoolean("Updating?", true);
+        //     }
+        //     // lastPose = new Pose2d(getLeftLLPose().getTranslation(), getPigeon2().getRotation2d());
         // }
         // if (getTVRear()) {
             
-        //     poseEstimator.addVisionMeasurement(new Pose2d(getRearLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-(m_limelightRear.getEntry("tl").getDouble(0.))/1000);
+        //     poseEstimator.addVisionMeasurement(new Pose2d(getRightLLPose().getTranslation(), getPigeon2().getRotation2d()), Utils.getCurrentTimeSeconds()-(m_limelightRight.getEntry("tl").getDouble(0.))/1000);
         // }
         // else if (getTV()) {
         //     poseEstimator.resetPose(new Pose2d(getPoseLL().getTranslation(), getPigeon2().getRotation2d()));
         // }
-    }
         // SmartDashboard.putBoolean("endedjneldkenk", getTVFront());
-        // if (getFrontLLPose().getRotation().getDegrees() - getPose().getRotation().getDegrees() > 90) {
-        //     getPigeon2().setYaw(getFrontLLPose().getRotation().getDegrees());
+        // if (getLeftLLPose().getRotation().getDegrees() - getPose().getRotation().getDegrees() > 90) {
+        //     getPigeon2().setYaw(getLeftLLPose().getRotation().getDegrees());
         // }
         
         // SmartDashboard.putBoolean("Sensor Val", sensor.get());
@@ -377,8 +386,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             DriverStation.getAlliance().ifPresent(allianceColor -> {
                 setOperatorPerspectiveForward(
                     allianceColor == Alliance.Blue
-                        ? kRedAlliancePerspectiveRotation
-                        : kBlueAlliancePerspectiveRotation
+                        ? kBlueAlliancePerspectiveRotation
+                        : kRedAlliancePerspectiveRotation
                 );
                 m_hasAppliedOperatorPerspective = true;
             });
@@ -441,20 +450,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     //   public double getTY() {
     //     return m_limelight.getEntry("ty").getDouble(0.0);
     //   }
-      public double getTXFront() {
-        return m_limelightFront.getEntry("tx").getDouble(0.);
+      public double getTXLeft() {
+        return m_limelightLeft.getEntry("tx").getDouble(0.);
       }
-      public double getTYFront() {
-        return m_limelightFront.getEntry("ty").getDouble(0.);
+      public double getTYLeft() {
+        return m_limelightLeft.getEntry("ty").getDouble(0.);
       }
-      public boolean getTVFront() {
-        return m_limelightFront.getEntry("tv").getDouble(0.) == 1.;
+      public boolean getTVLeft() {
+        return m_limelightLeft.getEntry("tv").getDouble(0.) == 1.;
       }
     //   public boolean getTV() {
     //     return m_limelight.getEntry("tv").getDouble(0.0) == 1.0;
     //   }
-      public boolean getTVRear() {
-        return m_limelightRear.getEntry("tv").getDouble(0.0) == 1.0;
+      public boolean getTVRight() {
+        return m_limelightRight.getEntry("tv").getDouble(0.0) == 1.0;
       }
     //   public double getTZ() {
     //     return m_limelight.getEntry("ty").getDouble(0.0);
@@ -468,14 +477,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     //     // table.getEntry("RobotPose").setDoubleArray(poseArray);
     //     // SmartDashboard.putNumberArray("Raw Pose", result);
     //   }
-      public Pose2d getRearLLPose() {
-        var array = m_limelightRear.getEntry("botpose_wpiblue").getDoubleArray(new double[]{});
+      public Pose2d getRightLLPose() {
+        var array = m_limelightRight.getEntry("botpose_wpiblue").getDoubleArray(new double[]{0,0,0,0,0,0});
         // double[] result = {array[0], array[1], array[5]};
         Pose2d pose = new Pose2d(0, 0, new Rotation2d(0));
         return pose;
       }
-      public Pose2d getFrontLLPose() {
-        var array = m_limelightFront.getEntry("botpose_wpiblue").getDoubleArray(new double[]{});
+      public Pose2d getLeftLLPose() {
+        var array = m_limelightLeft.getEntry("botpose_wpiblue").getDoubleArray(new double[]{0,0,0,0,0,0});
         double[] result = {array[0], array[1], array[5]};
         Pose2d pose = new Pose2d(result[0], result[1], new Rotation2d(result[2]));
         return pose;
@@ -526,7 +535,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 
     public double getTIDFront() {
-        return m_limelightFront.getEntry("tid").getDouble(0.);
+        return m_limelightLeft.getEntry("tid").getDouble(0.);
     }
     public Command FollowPathCommand(PathPlannerPath path) {
         //PathConstraints constraints = new PathConstraints(
@@ -559,5 +568,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
 
         // return AutoBuilder.followPath(path); }
-        
+       public double getTXRight() {
+        return m_limelightRight.getEntry("tx").getDouble(0.);
+      }
+      public double getTYRight() {
+        return m_limelightRight.getEntry("ty").getDouble(0.);
+}
 }

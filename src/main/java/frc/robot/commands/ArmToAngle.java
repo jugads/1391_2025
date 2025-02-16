@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,13 +17,11 @@ public class ArmToAngle extends Command {
     PIDController controller;
     Arm m_arm;
     double desiredArmAngle;
-   
+    ArmFeedforward feedforward;
     public ArmToAngle(Arm arm, double armAngle) {
       m_arm = arm;
-  
         // desiredArmAngle = m_arm.getEncoderPosition();      
-      
-      desiredArmAngle = armAngle;
+      desiredArmAngle = (armAngle/360)-0.25;
 
       controller = new PIDController(kPDynamic, kIDynamic, kDDynamic);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -34,17 +33,13 @@ public class ArmToAngle extends Command {
   public void initialize() {
     controller.setSetpoint(desiredArmAngle);
     controller.setTolerance(1.);
-    
+    m_arm.setSetpoint(desiredArmAngle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_arm.setSetpoint(desiredArmAngle);
-    if (m_arm.getEncoderPosition() != 360.) {
-    m_arm.runMotor(controller.calculate(m_arm.getEncoderPosition()));
-    }
-    SmartDashboard.putBoolean("Arm At angle", controller.atSetpoint());
+    SmartDashboard.putNumber("Feedforward Calculation",feedforward.calculate(desiredArmAngle, 0.2));
   }
 
   // Called once the command ends or is interrupted.
