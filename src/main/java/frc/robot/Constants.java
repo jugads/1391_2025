@@ -65,9 +65,9 @@ public class Constants {
         public static final double kI = 0.016;
         public static final double kD = 0;
         public static final double kTransferAngle = 0;
-        public static final double kPDynamic = 0.006;
+        public static final double kPDynamic = 3.;
         public static final double kIDynamic = 0.0;
-        public static final double kDDynamic = 0.00035;
+        public static final double kDDynamic = 0.1;
         public static final double kG = 0.0;
         public static final double kV = 0.0;
         public static final double kEncoderOffset = 0.25;

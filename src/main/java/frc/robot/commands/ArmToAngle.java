@@ -17,7 +17,7 @@ public class ArmToAngle extends Command {
     PIDController controller;
     Arm m_arm;
     double desiredArmAngle;
-    ArmFeedforward feedforward;
+    ArmFeedforward feedforward = new ArmFeedforward(0.0, 0.018, 0.0);
     public ArmToAngle(Arm arm, double armAngle) {
       m_arm = arm;
         // desiredArmAngle = m_arm.getEncoderPosition();      
@@ -31,21 +31,24 @@ public class ArmToAngle extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    controller.setSetpoint(desiredArmAngle);
-    controller.setTolerance(1.);
+    controller.setTolerance(0.001);
     m_arm.setSetpoint(desiredArmAngle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    SmartDashboard.putNumber("Feedforward Calculation",feedforward.calculate(desiredArmAngle, 0.2));
+    SmartDashboard.putNumber("Feedforward Calculation",feedforward.calculate(m_arm.getSetpoint(), 0.3));
+    SmartDashboard.putNumber("PID", controller.calculate(m_arm.getEncoderPosition(), m_arm.getSetpoint()));
+    SmartDashboard.putNumber("Desired arm angle", m_arm.getSetpoint());
+    m_arm.runMotor(feedforward.calculate(m_arm.getSetpoint(), 0.3)+controller.calculate(m_arm.getEncoderPosition(), m_arm.getSetpoint()));
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_arm.stop();
+    m_arm.setSetpoint(m_arm.getEncoderPosition());
   }
 
   // Returns true when the command should end.

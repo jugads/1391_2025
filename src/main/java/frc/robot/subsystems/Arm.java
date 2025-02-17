@@ -32,6 +32,7 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm Angle", getEncoderPosition());
     SmartDashboard.putNumber("Arm Speed Motor", motor.get());
     SmartDashboard.putNumber("Setpoint arm", lastPosition);
+    SmartDashboard.putNumber("Voltage", motor.getBusVoltage());
     // setSetpoint(getEncoderPosition());
     // This method will be called once per scheduler run
   }
@@ -40,7 +41,9 @@ public class Arm extends SubsystemBase {
   public void runMotor(double speed) {
     motor.set(speed);
   }
-
+  public void applyVoltage(double Volts) {
+    motor.setVoltage(Volts);
+  }
   // Stops arm movement by setting motor speed to 0
   public void stop() {
     motor.set(0.);
@@ -52,7 +55,7 @@ public class Arm extends SubsystemBase {
 
   // Checks if arm is at the transfer position (0 degrees)
   public boolean atTransferAngle() {
-    return Math.abs(getEncoderPosition() - kTransferAngle) <= 3;
+    return false;
   }
 
   public void setSetpoint(double encoderPosition) {
