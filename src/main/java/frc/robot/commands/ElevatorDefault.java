@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,6 +19,7 @@ public class ElevatorDefault extends Command {
   private final Elevator elevator;  
   // PID controller for height control
   private final PIDController pidController;
+  ElevatorFeedforward ff = new ElevatorFeedforward(0.0, 0.085, 0.67);
   double speed = 0;
   Arm arm;
   /** Creates a new ElevatorToHeight command. */
@@ -40,7 +42,8 @@ public class ElevatorDefault extends Command {
   @Override
   public void execute() {
     speed = MathUtil.clamp(pidController.calculate(elevator.getElevatorPosition(), elevator.getSetpoint()), -0.3, 0.6);
-    elevator.runElevatorUp(speed, arm);
+    SmartDashboard.putNumber("FFE", ff.calculate(speed));
+    elevator.runElevatorUp(ff.calculate(speed), arm);
   }
 
   // Called once the command ends or is interrupted

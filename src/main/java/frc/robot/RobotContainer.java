@@ -114,7 +114,7 @@ public class RobotContainer {
     Knuckle knuckle = new Knuckle();
     //Chute chute = new Chute();
     Hopper hopper = new Hopper();
-    Leds leds = new Leds(new AddressableLED(5), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer);
+    Leds leds = new Leds(new AddressableLED(6), new AddressableLEDBuffer(138), arm, knuckle, algaeScorer);
     Autos autos = new Autos(drivetrain, driveRR, arm, elevator, knuckle, leds);
 
     PathConstraints constraints = new PathConstraints(3.0, 3.0, 2*Math.PI, 4*Math.PI);
@@ -136,6 +136,7 @@ public class RobotContainer {
         };
         SmartDashboard.putNumberArray("MyPose", array);
         // SmartDashboard.putNumber("GETTX", drivetrain.getTXFront());
+        // SmartDashboard.putNumber("GETTX", drivetrain.getTXFront());
     }
 
     private void configureBindings() {
@@ -146,8 +147,8 @@ public class RobotContainer {
             drivetrain.applyRequest(
                 () ->
                 drive
-                .withVelocityX(joystick.getLeftY() * MaxSpeed * (DriverStation.getAlliance().get() == Alliance.Blue ? 1 : 1)) // Drive forward with negative Y (forward)
-                .withVelocityY(joystick.getLeftX() * MaxSpeed * (DriverStation.getAlliance().get() == Alliance.Blue ? 1 : 1)) // Drive left with negative X (left)
+                .withVelocityX(joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                .withVelocityY(joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                 .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -168,18 +169,19 @@ public class RobotContainer {
         );
 
         //DRIVER ------------------------------------------------------------------------------
-       joystick.x().whileTrue(
-        new RunCommand(() -> hopper.bothAtSameTime(0.2, 1), hopper).until(() -> hopper.hasCoralHopper()));
+       joystick.rightBumper().whileTrue(
+        new RunCommand(() -> hopper.bothAtSameTime(0.2, 1), hopper)
+    .until(()-> hopper.hasCoralHopper()));
 
-        joystick.rightBumper().whileTrue(
-            drivetrain.applyRequest(
-                () -> 
-                driveRR
-                .withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                .withRotationalRate(-joystick.getRightX() * MaxAngularRate)
-            )
-        );
+        // joystick.rightBumper().whileTrue(
+        //     drivetrain.applyRequest(
+        //         () -> 
+        //         driveRR
+        //         .withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+        //         .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+        //         .withRotationalRate(-joystick.getRightX() * MaxAngularRate)
+        //     )
+        // );
         joystick.rightTrigger().whileTrue(
         drivetrain.applyRequest(
             () ->
@@ -236,27 +238,27 @@ public class RobotContainer {
             new InstantCommand(() -> elevator.setSetpoint(0.08))
             ),
             new RunCommand(() -> leds.setDef(false), leds))); */
-            joystick.leftTrigger().whileTrue(
-                new SequentialCommandGroup(
-         new InstantCommand(() -> elevator.setSetpoint(0.54)),
-          new WaitUntilCommand(() -> elevator.getElevatorPosition() > 0.51
-          ),
-          new ArmToAngle(arm, 8).until(() -> arm.getEncoderPosition()<11),
-          new ParallelCommandGroup(
-            new RunCommand(() -> hopper.bothAtSameTime(0.5, 1), hopper),
-            new RunCommand(() -> knuckle.runMotor(1), knuckle)
-          ).until(() -> knuckle.hasCoral()),
-          new InstantCommand(() -> elevator.setSetpoint(0.6)).until(() -> elevator.getElevatorPosition() > 0.55),
-          new ParallelCommandGroup(
-          new SequentialCommandGroup(
-                    new InstantCommand(() -> elevator.setSetpoint(0.2)),
-                    new ArmToAngle(arm, 180)
-                ),
-             new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle)
+        joystick.leftTrigger().whileTrue(
+            new ParallelCommandGroup(
+            new SequentialCommandGroup(
+     new InstantCommand(() -> elevator.setSetpoint(0.5)),
+      new WaitUntilCommand(() -> elevator.getElevatorPosition() > 0.48),
+      new ArmToAngle(arm, 8).until(() -> arm.getEncoderPosition()<11),
+      new ParallelCommandGroup(
+        new RunCommand(() -> hopper.bothAtSameTime(0.5, 1), hopper),
+        new RunCommand(() -> knuckle.runMotor(1), knuckle)
+      ).until(() -> knuckle.hasCoral()),
+      new ParallelCommandGroup(
+      new SequentialCommandGroup(
+                new InstantCommand(() -> elevator.setSetpoint(0.2)),
+                new ArmToAngle(arm, 180)
+            ),
+         new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle)
+        )
+    ),
+     new RunCommand(() -> leds.setDef(false))
             )
-        ) 
-          
-            );
+        );
         
         joystick.leftBumper().whileTrue(new RunCommand(()->knuckle.score(), knuckle));
         joystick.y().whileTrue(
@@ -303,7 +305,7 @@ public class RobotContainer {
         )
         );
         joystick.b().whileTrue(AutoBuilder.pathfindToPose(kREDSOURCERIGHT, constraints));
-        //joystick.x().whileTrue(AutoBuilder.pathfindToPose(kREDSOURCELEFT, constraints));
+        joystick.x().whileTrue(AutoBuilder.pathfindToPose(kREDSOURCELEFT, constraints));
         
         //OPERATOR --------------------------------------------------------------------
         // operator.y().whileTrue(new ParallelCommandGroup(new RunCommand(() -> knuckle.setKnuckleMotorHigh(), knuckle), new RunCommand(() -> chute.runMotor(-0.3), chute)));
@@ -324,15 +326,15 @@ public class RobotContainer {
         );
         new JoystickButton(operator, kL2).whileTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> elevator.setSetpoint(0.21)),
-                new ArmToAngle(arm, 170),
+                new InstantCommand(() -> elevator.setSetpoint(0.22)),
+                new ArmToAngle(arm, 160),
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
         );
         new JoystickButton(operator, kL3).whileTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> elevator.setSetpoint(0.53)),
-                new ArmToAngle(arm, 170),
+                new InstantCommand(() -> elevator.setSetpoint(0.54)),
+                new ArmToAngle(arm, 160),
                 new RunCommand(() -> knuckle.setKnuckleMotorLow())
             )
         );

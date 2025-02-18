@@ -15,11 +15,12 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveToReef extends Command {
   /** Creates a new DriveToReef. */
-  PIDController xController = new PIDController(0.02, 0., 0.0013);
-  PIDController yController = new PIDController(0.0035, 0., 0.0003);
+  PIDController xController = new PIDController(0.0167, 0., 0.0013);
+  PIDController yController = new PIDController(0.004, 0., 0.0003);
   CommandSwerveDrivetrain drivetrain;
   SwerveRequest.RobotCentric drive;
   boolean aligningLeft;
+
 
   public DriveToReef(CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric drive, boolean aligningLeft) {
     this.drivetrain = drivetrain;
@@ -33,7 +34,7 @@ public class DriveToReef extends Command {
   @Override
   public void initialize() {
     xController.setSetpoint(aligningLeft ? -15 : -6);
-    yController.setSetpoint(aligningLeft ? -10 : 15);
+    yController.setSetpoint(aligningLeft ? -6 : 15);
     xController.setTolerance(0.3);
     yController.setTolerance(0.3);
   }
@@ -43,6 +44,8 @@ public class DriveToReef extends Command {
   @Override
   public void execute() {
     drivetrain.setControl(drive
+    .withVelocityX(-kMaxSpeed*xController.calculate(aligningLeft ? drivetrain.getTYRight() : drivetrain.getTYLeft()))
+    .withVelocityY(-kMaxSpeed * yController.calculate(aligningLeft ? drivetrain.getTXRight() : drivetrain.getTXLeft()))
     .withVelocityX(-kMaxSpeed*xController.calculate(aligningLeft ? drivetrain.getTYRight() : drivetrain.getTYLeft()))
     .withVelocityY(-kMaxSpeed * yController.calculate(aligningLeft ? drivetrain.getTXRight() : drivetrain.getTXLeft()))
     .withRotationalRate(0.)

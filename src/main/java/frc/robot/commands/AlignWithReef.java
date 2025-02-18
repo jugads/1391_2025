@@ -45,6 +45,7 @@ public class AlignWithReef extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if (drivetrain.getTVLeft() || drivetrain.getTVRight()) {
       drivetrain.setControl(
         drive
         .withRotationalRate(kMaxAngularRate * thetaController.calculate(getYaw()))
@@ -54,7 +55,7 @@ public class AlignWithReef extends Command {
       SmartDashboard.putNumber("Calculation", kMaxAngularRate*thetaController.calculate(getYaw()));
       SmartDashboard.putNumber("Alignment setpoint", thetaController.getSetpoint());
   }
-
+  }
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}

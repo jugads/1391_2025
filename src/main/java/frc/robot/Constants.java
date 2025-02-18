@@ -50,7 +50,7 @@ public class Constants {
         public static final int kRightMotorID = 2;
         // public static final int kDownLimitPort = 0;
         // public static final int kUpLimitPort = 0;
-        public static final double kP = 3.8;
+        public static final double kP = 4.;
         public static final double kI = 0.0028;
         public static final double kD = 0.17;
         public static final double kPDynamic = 0.2;
