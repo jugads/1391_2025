@@ -177,10 +177,8 @@ public class Autos extends Command {
  }
 */
  public Command fbranchanddbranch() {
-final AutoRoutine autoRoutine = autoFactory.newRoutine("fbranchanddbranch");
-final AutoTrajectory path = autoRoutine.trajectory("Start-FBranch");
-final AutoTrajectory path1 = autoRoutine.trajectory("FBranch-Source");
-final AutoTrajectory path2 = autoRoutine.trajectory("Source-DBranch");
+
+
 
  return Commands.sequence(
     // path.resetOdometry()
