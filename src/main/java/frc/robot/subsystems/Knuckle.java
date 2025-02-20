@@ -30,9 +30,9 @@ public class Knuckle extends SubsystemBase {
     if (motor.getOutputCurrent() >= 15) {
       coralCount ++;
     }
-    if (hasCoral()) {
-      setKnuckleMotorLow();
-    }
+    // if (hasCoral()) {
+    //   setKnuckleMotorLow();
+    // }
     // else {
     //   setKnuckleMotorHigh();
     // }

@@ -186,16 +186,15 @@ final AutoTrajectory path2 = autoRoutine.trajectory("Source-DBranch");
     // path.resetOdometry()
      new SequentialCommandGroup(
       new InstantCommand(() -> drivetrain.resetGyro(0)),
-      new ArmToAngle(arm, 160).until(() -> arm.getEncoderPosition()<180),
+      new ArmToAngle(arm, 160).until(() -> arm.getEncoderPosition()<170),
       AutoBuilder.pathfindToPose(kRED2_3, K_CONSTRAINTS),
-      new WaitUntilCommand(() -> drivetrain.getState().Speeds.omegaRadiansPerSecond == 0),
       new ParallelCommandGroup(
         new InstantCommand(() -> elevator.setSetpoint(0.55)),
         new ArmToAngle(arm, 168),
         new RunCommand(() -> knuckle.setKnuckleMotorLow())
       ).until(() -> elevator.getElevatorPosition() > 0.5),
       new DriveToReef(drivetrain, driveRR, false),
-      new RunCommand(() -> knuckle.score())
+      new RunCommand(() -> knuckle.score(), knuckle)
     ));
  }
 //  public Command spin() {
